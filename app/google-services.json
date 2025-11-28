@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "762219455894",
+    "project_id": "smartcampussafety-59c16",
+    "storage_bucket": "smartcampussafety-59c16.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:762219455894:android:ee903683d473441ff369b7",
+        "android_client_info": {
+          "package_name": "com.nidanursigirta.smartcampussafety"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD3tVQfoJwnyXGeuTqZPl5MEhPmmC9XBPA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
