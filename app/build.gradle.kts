@@ -6,9 +6,7 @@ plugins {
 
 android {
     namespace = "com.nidanursigirta.smartcampussafety"
-    compileSdk {
-        version = release(36)
-    }
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.nidanursigirta.smartcampussafety"
@@ -36,22 +34,26 @@ android {
     kotlinOptions {
         jvmTarget = "11"
     }
+
+    buildFeatures {
+        viewBinding = true
+    }
 }
 
 dependencies {
-    implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.appcompat)
-    implementation(libs.material)
-    implementation(libs.androidx.activity)
-    implementation(libs.androidx.constraintlayout)
+    // SDK 34 ile uyumlu sürümler
+    implementation("androidx.core:core-ktx:1.13.1")
+    implementation("androidx.appcompat:appcompat:1.7.0")
+    implementation("com.google.android.material:material:1.12.0")
+    implementation("androidx.activity:activity:1.9.0")
+    implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation(platform("com.google.firebase:firebase-bom:34.6.0"))
 
-    // 1. Kullanıcı Giriş/Çıkış işlemleri için
+    // Firebase
     implementation("com.google.firebase:firebase-auth")
-
-    // 2. Veritabanı işlemleri için
     implementation("com.google.firebase:firebase-firestore")
 
+    // Test
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

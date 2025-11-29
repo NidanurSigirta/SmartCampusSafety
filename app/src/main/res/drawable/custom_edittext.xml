@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--Giriş Ekranı Arkaplan Desen Kuralları  -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle"> <!-- kutu dikdörtgen olarak ayarlandı  -->
+
+    <!-- kutu çerçevesi ayarları  -->
+    <stroke
+        android:width="2dp"
+        android:color="@color/lavender" />
+
+    <corners android:radius="30dp" /> <!-- kutu köşeleri hafif yuvarlak hale getirildi. -->
+
+</shape>
