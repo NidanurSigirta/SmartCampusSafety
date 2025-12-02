@@ -1,10 +1,147 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:background="@drawable/example_login"
     tools:context=".SignUpActivity">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <!-- Ana Kart Yapısı -->
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="24dp"
+        app:cardCornerRadius="30dp"
+        app:cardElevation="20dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="24dp"
+            android:background="@drawable/custom_edittext">
+
+            <!-- Başlık -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Aramıza Katıl"
+                android:textSize="32sp"
+                android:textAlignment="center"
+                android:textStyle="bold"
+                android:textColor="@color/lavender"
+                android:layout_marginBottom="20dp"
+                tools:ignore="HardcodedText,TextContrastCheck" />
+
+            <!-- 1. Ad Soyad -->
+            <EditText
+                android:id="@+id/etNameSurname"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:background="@drawable/custom_edittext"
+                android:hint="Ad Soyad"
+                android:inputType="text|textCapWords"
+                android:drawableStart="@drawable/outline_account_circle_24"
+                android:drawablePadding="12dp"
+                android:padding="12dp"
+                android:textColor="@color/black"
+                android:layout_marginBottom="12dp"
+                android:autofillHints="name"
+                tools:ignore="HardcodedText,VisualLintTextFieldSize,TextContrastCheck" />
+
+            <!-- 2. Birim / Bölüm -->
+            <EditText
+                android:id="@+id/etDepartment"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:background="@drawable/custom_edittext"
+                android:hint="Bölüm (Örn: Bilgisayar Müh.)"
+                android:inputType="text|textCapWords"
+                android:drawableStart="@drawable/outline_account_circle_24"
+                android:drawablePadding="12dp"
+                android:padding="12dp"
+                android:textColor="@color/black"
+                android:layout_marginBottom="12dp"
+                android:autofillHints="organization"
+                tools:ignore="HardcodedText,VisualLintTextFieldSize,TextContrastCheck" />
+
+            <!-- 3. E-posta -->
+            <EditText
+                android:id="@+id/etRegisterEmail"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:background="@drawable/custom_edittext"
+                android:hint="E-posta Adresi"
+                android:inputType="textEmailAddress"
+                android:drawableStart="@drawable/outline_account_circle_24"
+                android:drawablePadding="12dp"
+                android:padding="12dp"
+                android:textColor="@color/black"
+                android:layout_marginBottom="12dp"
+                android:autofillHints="emailAddress"
+                tools:ignore="HardcodedText,VisualLintTextFieldSize,TextContrastCheck" />
+
+            <!-- 4. Şifre -->
+            <EditText
+                android:id="@+id/etRegisterPassword"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:background="@drawable/custom_edittext"
+                android:hint="Şifre Belirle"
+                android:inputType="textPassword"
+                android:drawableStart="@drawable/lock_icon"
+                android:drawablePadding="12dp"
+                android:padding="12dp"
+                android:textColor="@color/black"
+                android:layout_marginBottom="4dp"
+                android:autofillHints="password"
+                tools:ignore="HardcodedText,VisualLintTextFieldSize,TextContrastCheck" />
+
+            <!-- Şifre Kuralı Bilgilendirmesi -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="*Şifreniz en az 6 karakter olmalıdır."
+                android:textSize="12sp"
+                android:textColor="#757575"
+                android:layout_marginBottom="20dp"
+                android:layout_marginStart="4dp"
+                tools:ignore="HardcodedText,TextContrastCheck" />
+
+            <!-- Kayıt Ol Butonu -->
+            <Button
+                android:id="@+id/btnRegisterFinish"
+                android:layout_width="match_parent"
+                android:layout_height="55dp"
+                android:text="KAYIT OL"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:backgroundTint="@color/lavender"
+                app:cornerRadius="20dp"
+                tools:ignore="HardcodedText,VisualLintButtonSize,TextContrastCheck" />
+
+            <!-- Giriş Yap Linki (Düzeltildi: minHeight eklendi) -->
+            <TextView
+                android:id="@+id/tvBackToLogin"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="48dp"
+                android:gravity="center"
+                android:text="Zaten hesabın var mı? Giriş Yap"
+                android:textAlignment="center"
+                android:textColor="@color/lavender"
+                android:textStyle="bold"
+                android:padding="16dp"
+                android:background="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true"
+                tools:ignore="HardcodedText,TextContrastCheck" />
+
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+
+</LinearLayout>

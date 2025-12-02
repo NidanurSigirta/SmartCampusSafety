@@ -8,6 +8,10 @@ android {
     namespace = "com.nidanursigirta.smartcampussafety"
     compileSdk = 36
 
+    buildFeatures {
+        viewBinding = true
+    }
+
     defaultConfig {
         applicationId = "com.nidanursigirta.smartcampussafety"
         minSdk = 24
