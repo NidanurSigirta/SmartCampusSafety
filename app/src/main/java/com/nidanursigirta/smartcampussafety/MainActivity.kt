@@ -16,7 +16,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        // ViewBinding ile tasarıma bağlanıyoruz
+        // Tasarım dosyasını (XML) koda bağlıyoruz
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -24,26 +24,32 @@ class MainActivity : AppCompatActivity() {
         auth = FirebaseAuth.getInstance()
         db = FirebaseFirestore.getInstance()
 
-        // --- DÜZELTME: OTOMATİK GİRİŞİ İPTAL ETME ---
-        // Uygulama her açıldığında (MainActivity başladığında)
-        // önceki oturumu kapatıyoruz ki kullanıcı tekrar şifre girmek zorunda kalsın.
+        // --- GÜVENLİK ADIMI: OTOMATİK GİRİŞİ İPTAL ETME ---
+        // Uygulama her açıldığında önceki oturumu kapatıyoruz ki
+        // kullanıcı tekrar şifre girmek zorunda kalsın (Test aşaması için).
         if (auth.currentUser != null) {
             auth.signOut()
         }
 
-        // --- KAYIT OL SAYFASINA GİT ---
+        // ----------------------------------------------------------------
+        // ADIM 1: KAYIT OL SAYFASINA GEÇİŞ (Duygu'nun koduyla aynı mantık)
+        // ----------------------------------------------------------------
         binding.signUpButton.setOnClickListener {
             val intent = Intent(this, SignUpActivity::class.java)
             startActivity(intent)
         }
 
-        // --- ŞİFREMİ UNUTTUM SAYFASINA GİT ---
+        // ----------------------------------------------------------------
+        // ADIM 2: ŞİFREMİ UNUTTUM SAYFASINA GEÇİŞ
+        // ----------------------------------------------------------------
         binding.forgotPasswordText.setOnClickListener {
             val intent = Intent(this, ForgotPasswordActivity::class.java)
             startActivity(intent)
         }
 
-        // --- GİRİŞ YAP BUTONU ---
+        // ----------------------------------------------------------------
+        // ADIM 3: GİRİŞ YAP BUTONU (Senin Gelişmiş Kodun)
+        // ----------------------------------------------------------------
         binding.loginButton.setOnClickListener {
             // Kullanıcının girdiği verileri alalım
             val email = binding.etEmail.text.toString().trim()
@@ -95,6 +101,7 @@ class MainActivity : AppCompatActivity() {
     private fun goToHome() {
         val intent = Intent(this, HomeActivity::class.java)
         startActivity(intent)
-        finish() // Geri tuşuna basınca tekrar giriş ekranına dönmesin diye bu aktiviteyi bitiriyoruz.
+        // Geri tuşuna basınca tekrar giriş ekranına dönmesin diye finish() ekledik
+        finish()
     }
 }
