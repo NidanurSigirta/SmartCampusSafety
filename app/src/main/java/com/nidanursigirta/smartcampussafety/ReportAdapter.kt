@@ -1,7 +1,7 @@
 package com.nidanursigirta.smartcampussafety
 
+import android.content.Intent // 1. EKLENEN KÜTÜPHANE
 import android.graphics.Color
-import android.graphics.PorterDuff
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -50,34 +50,43 @@ class ReportAdapter(var reportList: ArrayList<Report>) :
             else -> holder.tvStatus.setTextColor(Color.BLACK)
         }
 
-        // --- İKON RENGİ VE TÜRÜ ---
-        // İkonların soluk görünmemesi için onlara canlı renkler atıyoruz (Tint)
+        // İkon Rengi ve Türü
         when (report.type) {
             "Sağlık" -> {
                 holder.ivIcon.setImageResource(R.drawable.ic_health)
-                holder.ivIcon.setColorFilter(Color.parseColor("#E91E63")) // Canlı Pembe/Kırmızı
+                holder.ivIcon.setColorFilter(Color.parseColor("#E91E63"))
             }
             "Güvenlik" -> {
                 holder.ivIcon.setImageResource(R.drawable.ic_security)
-                holder.ivIcon.setColorFilter(Color.parseColor("#2196F3")) // Canlı Mavi
+                holder.ivIcon.setColorFilter(Color.parseColor("#2196F3"))
             }
             "Teknik Arıza" -> {
                 holder.ivIcon.setImageResource(R.drawable.ic_repair)
-                holder.ivIcon.setColorFilter(Color.parseColor("#FF9800")) // Turuncu
+                holder.ivIcon.setColorFilter(Color.parseColor("#FF9800"))
             }
             "Çevre" -> {
                 holder.ivIcon.setImageResource(R.drawable.ic_nature)
-                holder.ivIcon.setColorFilter(Color.parseColor("#4CAF50")) // Yeşil
+                holder.ivIcon.setColorFilter(Color.parseColor("#4CAF50"))
             }
             "Kayıp-Buluntu" -> {
                 holder.ivIcon.setImageResource(R.drawable.ic_lost)
-                holder.ivIcon.setColorFilter(Color.parseColor("#9C27B0")) // Mor
+                holder.ivIcon.setColorFilter(Color.parseColor("#9C27B0"))
             }
             else -> {
                 holder.ivIcon.setImageResource(R.drawable.ic_default)
-                holder.ivIcon.setColorFilter(Color.parseColor("#607D8B")) // Gri
+                holder.ivIcon.setColorFilter(Color.parseColor("#607D8B"))
             }
         }
+
+        // --- 2. EKLENEN KISIM: TIKLAMA OLAYI ---
+        holder.itemView.setOnClickListener {
+            // Tıklanan raporun ID'sini alıp Detay sayfasına gönderiyoruz
+            val context = holder.itemView.context
+            val intent = Intent(context, DetailActivity::class.java)
+            intent.putExtra("REPORT_ID", report.reportId) // ID'yi taşıyoruz
+            context.startActivity(intent)
+        }
+        // ---------------------------------------
     }
 
     override fun getItemCount(): Int {

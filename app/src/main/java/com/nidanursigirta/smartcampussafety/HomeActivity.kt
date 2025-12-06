@@ -25,7 +25,7 @@ class HomeActivity : AppCompatActivity() {
 
     private lateinit var reportAdapter: ReportAdapter
 
-    // --- YENİ: Seçili filtreyi hafızada tutmak için değişken ---
+    // Seçili filtreyi hafızada tutmak için değişken
     private var currentFilterTitle = "Tümü"
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -56,6 +56,13 @@ class HomeActivity : AppCompatActivity() {
             }
             override fun afterTextChanged(s: Editable?) {}
         })
+
+        // --- HARİTA BUTONU (YENİ EKLENDİ) ---
+        // ViewBinding kullandığın için findViewById'ye gerek yok, direkt binding ile erişiyoruz.
+        binding.btnMapGecis.setOnClickListener {
+            val intent = Intent(this, MapActivity::class.java)
+            startActivity(intent)
+        }
 
         // --- FİLTRELEME BUTONU ---
         binding.ivFilter.setOnClickListener {
