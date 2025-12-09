@@ -9,14 +9,22 @@ import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.nidanursigirta.smartcampussafety.databinding.ActivityDetailBinding
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.OnMapReadyCallback
+import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.MarkerOptions
 
-class DetailActivity : AppCompatActivity() {
+class DetailActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private lateinit var binding: ActivityDetailBinding
     private lateinit var db: FirebaseFirestore
     private lateinit var auth: FirebaseAuth
     private var reportId: String? = null
     private var currentReport: Report? = null
+
+    private lateinit var mMap: GoogleMap
 
     // Takip durumu kontrolü için
     private var isFollowing = false
@@ -35,13 +43,50 @@ class DetailActivity : AppCompatActivity() {
         binding.btnBack.setOnClickListener { finish() }
 
         if (reportId != null) {
-            getReportDetails(reportId!!)
-            checkUserRole()
-            checkIfFollowing()
+            if (reportId!!.startsWith("ornek_")) {
+                // BU BİR ÖRNEK (SAHTE) BİLDİRİMDİR
+                // Veritabanına gitme, Intent'ten gelenlerle sahte rapor oluştur
+                val fakeReport = Report(
+                    reportId = reportId!!,
+                    title = intent.getStringExtra("baslik") ?: "Örnek Başlık",
+                    description = intent.getStringExtra("aciklama") ?: "Açıklama yok",
+                    type = intent.getStringExtra("tur") ?: "Genel",
+                    status = "Açık",
+
+                    // Koordinatları al
+                    latitude = intent.getDoubleExtra("lat", 0.0),
+                    longitude = intent.getDoubleExtra("lng", 0.0),
+                    timestamp = com.google.firebase.Timestamp.now() // Hata vermemesi için şimdiki zaman
+                )
+
+                // Ekranda gösterme
+                currentReport = fakeReport
+                updateUI(fakeReport)
+
+                // Örnek bildirimde zaman yazısını elle düzelt ("10 dk önce" gibi görünsün)
+                val zamanYazisi = intent.getStringExtra("zaman")
+                if (!zamanYazisi.isNullOrEmpty()) {
+                    binding.txtDate.text = zamanYazisi
+                }
+
+                // Örnek bildirimde butonları gizle (Hata çıkmasın)
+                binding.adminPanel.visibility = View.GONE
+                binding.btnFollow.visibility = View.GONE
+
+            } else {
+                getReportDetails(reportId!!)
+                checkUserRole()
+                checkIfFollowing()
+            }
         } else {
             Toast.makeText(this, "Hata: Rapor ID bulunamadı", Toast.LENGTH_SHORT).show()
             finish()
         }
+
+        // Harita Fragment'ını başlatma
+        val mapFragment = supportFragmentManager
+            .findFragmentById(R.id.detailMapFragment) as SupportMapFragment
+        mapFragment.getMapAsync(this)
 
         // --- BUTON İŞLEMLERİ ---
 
@@ -59,6 +104,21 @@ class DetailActivity : AppCompatActivity() {
         val statuses = arrayOf("Açık", "İnceleniyor", "Çözüldü")
         val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, statuses)
         binding.spinnerStatus.adapter = adapter
+    }
+
+
+    override fun onMapReady(googleMap: GoogleMap) {
+        mMap = googleMap
+
+        // Harita ayarları: Sayfayı kaydırırken harita karışmasın diye elle kaydırmayı kapatıyoruz
+        mMap.uiSettings.isScrollGesturesEnabled = false
+        mMap.uiSettings.isZoomGesturesEnabled = true
+        mMap.uiSettings.isMapToolbarEnabled = false
+
+        // Eğer veriler haritadan önce yüklendiyse (internet hızlıysa) haritayı güncelle
+        if (currentReport != null) {
+            updateMapLocation(currentReport!!)
+        }
     }
 
     private fun getReportDetails(id: String) {
@@ -91,7 +151,21 @@ class DetailActivity : AppCompatActivity() {
             "Çözüldü" -> binding.txtStatus.setTextColor(Color.parseColor("#4CAF50")) // Yeşil
         }
 
-        // Harita kodları buradan tamamen kaldırıldı.
+        //Harita hazırsa konumu güncelleme
+        if (::mMap.isInitialized) {
+            updateMapLocation(report)
+        }
+    }
+
+    private fun updateMapLocation(report: Report) {
+        // Eğer koordinatlar 0.0 değilse (yani konum bilgisi varsa)
+        if (report.latitude != 0.0 && report.longitude != 0.0) {
+            val location = LatLng(report.latitude, report.longitude)
+
+            mMap.clear() // Eski pinleri temizle
+            mMap.addMarker(MarkerOptions().position(location).title(report.title)) // Pin ekle
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(location, 16f)) // Oraya odaklan
+        }
     }
 
     // --- ROL KONTROLÜ (Admin mi User mı?) ---
@@ -122,10 +196,17 @@ class DetailActivity : AppCompatActivity() {
             .update("status", newStatus)
             .addOnSuccessListener {
                 Toast.makeText(this, "Durum güncellendi: $newStatus", Toast.LENGTH_SHORT).show()
+
                 // UI'ı anlık güncelle
                 binding.txtStatus.text = newStatus.uppercase()
-                // Rengi de güncelle
-                updateUI(currentReport?.apply { status = newStatus })
+                when (newStatus) {
+                    "Açık" -> binding.txtStatus.setTextColor(Color.RED)
+                    "İnceleniyor" -> binding.txtStatus.setTextColor(Color.parseColor("#FF9800"))
+                    "Çözüldü" -> binding.txtStatus.setTextColor(Color.parseColor("#4CAF50"))
+                }
+
+                // Lokal veriyi de güncelle
+                currentReport?.status = newStatus
             }
             .addOnFailureListener {
                 Toast.makeText(this, "Güncelleme başarısız", Toast.LENGTH_SHORT).show()

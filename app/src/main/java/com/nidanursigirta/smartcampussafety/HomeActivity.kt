@@ -57,6 +57,12 @@ class HomeActivity : AppCompatActivity() {
             override fun afterTextChanged(s: Editable?) {}
         })
 
+        // --- PROFİL SAYFASI BUTONU ---
+        binding.btnProfile.setOnClickListener {
+            val intent = Intent(this, ProfileActivity::class.java)
+            startActivity(intent)
+        }
+
         // --- HARİTA BUTONU (YENİ EKLENDİ) ---
         // ViewBinding kullandığın için findViewById'ye gerek yok, direkt binding ile erişiyoruz.
         binding.btnMapGecis.setOnClickListener {

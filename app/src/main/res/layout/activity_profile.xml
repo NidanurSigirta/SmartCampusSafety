@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/example_profile_layout">
+
+    <ImageView
+        android:id="@+id/btnBackProfile"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_margin="24dp"
+        android:padding="8dp"
+        android:src="@android:drawable/ic_menu_revert"
+        app:tint="@color/white"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:contentDescription="Geri Dön"/>
+
+    <TextView
+        android:id="@+id/tvProfileTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Profilim"
+        android:textColor="@color/white"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:layout_marginStart="8dp"
+        app:layout_constraintStart_toEndOf="@id/btnBackProfile"
+        app:layout_constraintTop_toTopOf="@id/btnBackProfile"
+        app:layout_constraintBottom_toBottomOf="@id/btnBackProfile" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.32" />
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardProfileImage"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        app:cardCornerRadius="60dp"
+        app:cardElevation="8dp"
+        app:cardBackgroundColor="@color/ice_blue"
+        app:layout_constraintBottom_toBottomOf="@+id/guideline"
+        app:layout_constraintTop_toTopOf="@+id/guideline"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <ImageView
+            android:id="@+id/imgProfile"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="15dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/contacts_product_24dp_000000__f_ll0_wght400_grad0_opsz24"
+            app:tint="#757575"
+            android:contentDescription="Profil Fotoğrafı"/>
+    </androidx.cardview.widget.CardView>
+
+    <TextView
+        android:id="@+id/tvProfileName"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Ad Soyad Yükleniyor"
+        android:textColor="@color/black"
+        android:textSize="22sp"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:layout_marginTop="20dp"
+        android:layout_marginHorizontal="20dp"
+        app:layout_constraintTop_toBottomOf="@id/cardProfileImage"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+    <TextView
+        android:id="@+id/tvProfileRole"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Kullanıcı Rolü"
+        android:textColor="#2196F3"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:layout_marginTop="4dp"
+        app:layout_constraintTop_toBottomOf="@id/tvProfileName"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <TextView
+        android:id="@+id/tvProfileEmail"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="email@ornek.com"
+        android:textColor="#757575"
+        android:textSize="14sp"
+        android:layout_marginTop="2dp"
+        app:layout_constraintTop_toBottomOf="@id/tvProfileRole"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="24dp"
+        android:paddingHorizontal="20dp"
+        android:paddingBottom="20dp"
+        android:clipToPadding="false"
+        android:background="@android:color/transparent"
+        app:layout_constraintTop_toBottomOf="@id/tvProfileEmail"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardFollowed"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:layout_marginBottom="15dp"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="3dp"
+                app:cardBackgroundColor="#FFFFFF">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center_vertical"
+                    android:paddingHorizontal="16dp">
+
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:src="@drawable/stars_2_24dp_000000__f_ll0_wght400_grad0_opsz24"
+                        app:tint="#FF9800"
+                        android:contentDescription="Takip İkonu"/>
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Takip Edilen Bildirimler"
+                        android:textSize="16sp"
+                        android:textColor="@color/black"
+                        android:layout_marginStart="16dp"/>
+
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:src="@android:drawable/ic_media_play"
+                        app:tint="#BDBDBD"
+                        android:contentDescription="İlerleme Oku"/>
+
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardNotificationSettings"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:layout_marginBottom="25dp"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="3dp"
+                app:cardBackgroundColor="#FFFFFF">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center_vertical"
+                    android:paddingHorizontal="16dp">
+
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:src="@android:drawable/ic_popup_reminder"
+                        app:tint="#4CAF50"
+                        android:contentDescription="Ayarlar İkonu"/>
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Bildirim Ayarları"
+                        android:textSize="16sp"
+                        android:textColor="@color/black"
+                        android:layout_marginStart="16dp"/>
+
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:src="@android:drawable/ic_media_play"
+                        app:tint="#BDBDBD"
+                        android:contentDescription="İlerleme Oku"/>
+
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <Button
+                android:id="@+id/btnLogout"
+                android:layout_width="match_parent"
+                android:layout_height="55dp"
+                android:text="Çıkış Yap"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:backgroundTint="#F44336"
+                app:cornerRadius="30dp"/>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="40dp"/>
+
+        </LinearLayout>
+    </ScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

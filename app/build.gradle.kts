@@ -57,6 +57,8 @@ dependencies {
     // Firebase
     implementation("com.google.firebase:firebase-auth")
     implementation("com.google.firebase:firebase-firestore")
+    implementation("com.google.firebase:firebase-storage")
+    implementation(libs.androidx.cardview)
 
     // Test
     testImplementation(libs.junit)

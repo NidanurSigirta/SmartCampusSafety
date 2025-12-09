@@ -7,18 +7,48 @@ import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.nidanursigirta.smartcampussafety.databinding.ActivityAddReportBinding
 import java.util.Date
+import android.content.Intent
 
 class AddReportActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityAddReportBinding
     private lateinit var db: FirebaseFirestore
     private lateinit var auth: FirebaseAuth
+
+    //Konum verilerini tutacak değişkenler:
+    private var selectedLatitude: Double? = null
+    private var selectedLongitude: Double? = null
+
+    //MapActivity'den yani harita sayfasından gelicek cevabı tutma:
+    private val mapLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult())
+    {
+        result ->
+
+        //İşlem başarılıysa
+        if (result.resultCode == RESULT_OK)
+        {
+            val data = result.data //Haritadan gelen veri paketi
+            if(data != null)
+            {
+                //Veri paketi içindeki koordinatları değişkenlerimize kaydetme
+                selectedLatitude = data.getDoubleExtra("latitude", 0.0)
+                selectedLongitude = data.getDoubleExtra("longitude", 0.0)
+
+                //Seçim işlemi başarıyla gerçekleştiğini gösterme:
+                binding.btnAddLocation.text = "Konum Seçildi ✅"
+                binding.btnAddLocation.setTextColor(Color.parseColor("#2E7D32"))
+                Toast.makeText(this, "Konum başarıyla alındı!", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -84,8 +114,12 @@ class AddReportActivity : AppCompatActivity() {
         binding.spinnerType.adapter = adapter
 
         // 3. Butonlar (Toast Mesajı)
+
+        //Konum Ekle Butonu
         binding.btnAddLocation.setOnClickListener {
-            Toast.makeText(this, "Harita sonra eklenecek", Toast.LENGTH_SHORT).show()
+            val intent = Intent(this, MapActivity::class.java)
+            intent.putExtra("mode", "selection") //Haritadan konum seçmek için
+            mapLauncher.launch(intent)
         }
         binding.btnAddPhoto.setOnClickListener {
             Toast.makeText(this, "Kamera sonra eklenecek", Toast.LENGTH_SHORT).show()
@@ -125,7 +159,9 @@ class AddReportActivity : AppCompatActivity() {
             "status" to "Açık",
             "timestamp" to Timestamp(Date()),
             "creatorId" to user.uid,
-            "imageUrl" to ""
+            "imageUrl" to "",
+            "latitude" to (selectedLatitude ?: 0.0),
+            "longitude" to (selectedLongitude ?: 0.0)
         )
 
         newReportRef.set(report)

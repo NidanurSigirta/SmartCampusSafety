@@ -5,6 +5,8 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
 
     <application
         android:allowBackup="true"
@@ -16,6 +18,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.SmartCampusSafety">
         <activity
+            android:name=".NotificationSettingsActivity"
+            android:exported="false" />
+        <activity
             android:name=".DetailActivity"
             android:exported="false" />
         <activity
@@ -24,7 +29,7 @@
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyC4OS0l66cgEjttAgh6vL8LgFaWwEoUNak" />
+            android:value="AIzaSyD3tVQfoJwnyXGeuTqZPl5MEhPmmC9XBPA" />
 
         <activity
             android:name=".AddReportActivity"
@@ -53,6 +58,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".ProfileActivity"
+            android:exported="false" />
+        <activity
+            android:name=".FollowedReportsActivity_"
+            android:exported="false" />
     </application>
 
 </manifest>

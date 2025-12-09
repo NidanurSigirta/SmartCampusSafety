@@ -48,7 +48,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         // ----------------------------------------------------------------
-        // ADIM 3: GİRİŞ YAP BUTONU (Senin Gelişmiş Kodun)
+        // ADIM 3: GİRİŞ YAP BUTONU
         // ----------------------------------------------------------------
         binding.loginButton.setOnClickListener {
             // Kullanıcının girdiği verileri alalım
