@@ -6,6 +6,7 @@ import android.widget.Button
 import android.widget.Switch
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import android.widget.ImageView
 
 class NotificationSettingsActivity : AppCompatActivity() {
 
@@ -18,10 +19,9 @@ class NotificationSettingsActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
         setContentView(R.layout.activity_notification_settings)
 
-        // 🔗 Switch bağlama
+        // Switch bağlama
         switchHealth = findViewById(R.id.switchHealth)
         switchSecurity = findViewById(R.id.switchSecurity)
         switchEnvironment = findViewById(R.id.switchEnvironment)
@@ -29,10 +29,16 @@ class NotificationSettingsActivity : AppCompatActivity() {
         switchLost = findViewById(R.id.switchLost_found)
         btnSave = findViewById(R.id.btnSave)
 
-        // 🔄 Eskiden kaydedilen ayarları yükle
+
+        val btnBack: ImageView = findViewById(R.id.btnBack)
+        btnBack.setOnClickListener {
+            finish()
+        }
+
+        // Eskiden kaydedilen ayarları yükle
         loadSettings()
 
-        // 💾 Kaydet butonu
+        // Kaydet butonu
         btnSave.setOnClickListener {
             saveSettings()
         }

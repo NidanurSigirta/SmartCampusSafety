@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     tools:context=".FollowedReportsActivity_">
 
-    <!-- ÜST BAR (Header) -->
+    <!-- Toolbar (Header) -->
     <LinearLayout
         android:id="@+id/header"
         android:layout_width="match_parent"
@@ -36,7 +36,7 @@
             android:layout_marginStart="30dp"/>
     </LinearLayout>
 
-    <!-- TAKİP EDİLENLER LİSTESİ -->
+    <!-- Takip edilen bildirimler listesi -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_view_followed"
         android:layout_width="match_parent"

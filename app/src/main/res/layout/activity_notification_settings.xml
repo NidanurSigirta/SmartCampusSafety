@@ -12,7 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <!-- Başlık ve Geri Tuşu -->
+        <!-- Toolbar -->
         <LinearLayout
             android:orientation="horizontal"
             android:layout_width="match_parent"
@@ -26,7 +26,8 @@
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:src="@android:drawable/ic_menu_revert"
-                app:tint="@color/purple_700" />
+                app:tint="@color/purple_700"
+                android:clickable="true"/>
 
             <TextView
                 android:layout_width="wrap_content"

@@ -22,7 +22,7 @@ class ProfileActivity : AppCompatActivity() {
         auth = FirebaseAuth.getInstance()
         db = FirebaseFirestore.getInstance()
 
-        // Geri Dön
+        // Geri Dön Tuşu
         binding.btnBackProfile.setOnClickListener { finish() }
 
         // Kullanıcı Bilgilerini Yükle

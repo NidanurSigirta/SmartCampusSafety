@@ -45,7 +45,7 @@ class DetailActivity : AppCompatActivity(), OnMapReadyCallback {
         if (reportId != null) {
             if (reportId!!.startsWith("ornek_")) {
                 // BU BİR ÖRNEK (SAHTE) BİLDİRİMDİR
-                // Veritabanına gitme, Intent'ten gelenlerle sahte rapor oluştur
+                // Veritabanına gitmeyip Intent'ten gelenlerle sahte rapor oluşturma
                 val fakeReport = Report(
                     reportId = reportId!!,
                     title = intent.getStringExtra("baslik") ?: "Örnek Başlık",

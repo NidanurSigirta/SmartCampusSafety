@@ -32,6 +32,7 @@
         app:layout_constraintTop_toTopOf="@id/btnBackProfile"
         app:layout_constraintBottom_toBottomOf="@id/btnBackProfile" />
 
+    <!-- Profil fotoğrafı kılavuzu (guideline) -->
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline"
         android:layout_width="wrap_content"
@@ -39,6 +40,7 @@
         android:orientation="horizontal"
         app:layout_constraintGuide_percent="0.32" />
 
+    <!-- Profil fotoğrafı kartı -->
     <androidx.cardview.widget.CardView
         android:id="@+id/cardProfileImage"
         android:layout_width="120dp"
@@ -101,6 +103,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
+    <!-- Profil seçenekleri  -->
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -119,6 +122,7 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
+            <!-- Takip edilen bildirimler kartı -->
             <androidx.cardview.widget.CardView
                 android:id="@+id/cardFollowed"
                 android:layout_width="match_parent"
@@ -150,16 +154,10 @@
                         android:textColor="@color/black"
                         android:layout_marginStart="16dp"/>
 
-                    <ImageView
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:src="@android:drawable/ic_media_play"
-                        app:tint="#BDBDBD"
-                        android:contentDescription="İlerleme Oku"/>
-
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
+            <!-- Bildirim ayarları kartı -->
             <androidx.cardview.widget.CardView
                 android:id="@+id/cardNotificationSettings"
                 android:layout_width="match_parent"
@@ -191,12 +189,6 @@
                         android:textColor="@color/black"
                         android:layout_marginStart="16dp"/>
 
-                    <ImageView
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:src="@android:drawable/ic_media_play"
-                        app:tint="#BDBDBD"
-                        android:contentDescription="İlerleme Oku"/>
 
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
