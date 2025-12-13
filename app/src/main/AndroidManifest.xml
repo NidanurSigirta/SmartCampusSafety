@@ -18,6 +18,10 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.SmartCampusSafety">
         <activity
+            android:name=".AdminPanelActivity"
+            android:exported="false" />
+
+        <activity
             android:name=".NotificationSettingsActivity"
             android:exported="false" />
         <activity
