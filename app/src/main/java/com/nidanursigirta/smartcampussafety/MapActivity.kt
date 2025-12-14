@@ -121,27 +121,20 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
 
+        // Kampüs Merkezi Koordinatları (Hem normal mod hem seçim modu için varsayılan odak)
+        val campusCenter = LatLng(39.89953921087502, 41.244187083657714)
+
         if (!isSelectionMode) {
-            // NORMAL MOD (Örnek Bildirimleri Göster)
-            val bildirimListesi = listOf(
-                HaritaBildirim("ornek_id_1","Kütüphane Girişi Kaygan", "Tehlike", "10 dk önce", 39.90087240850197, 41.24577472764604),
-                HaritaBildirim("ornek_id_2","Kafeterya Çok Dolu", "Bilgi", "30 dk önce",39.89839247952649, 41.246189221694074 ),
-                HaritaBildirim("ornek_id_3","Asansör Arızalı", "Teknik", "2 saat önce",39.90099488175911, 41.24347808372609 )
-            )
+            // NORMAL MOD
+            // Örnek liste kodları SİLİNDİ.
 
-            for (bildirim in bildirimListesi) {
-                pinEkle(bildirim)
-            }
+            fetchReportsFromFirestore() // Sadece veritabanındaki gerçek verileri getir
 
-            fetchReportsFromFirestore() //Yeni oluşturduğumuz bildirimi haritada göstermek için
-
-            // İlk bildirime odaklan
-            val ilkKonum = LatLng(bildirimListesi[0].lat, bildirimListesi[0].lng)
-            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(ilkKonum, 15f))
+            // Harita açılınca varsayılan olarak kampüs merkezine odaklan
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(campusCenter, 15f))
 
         } else {
             // SEÇİM MODU (Kampüs merkezine odaklan)
-            val campusCenter = LatLng(39.89953921087502, 41.244187083657714)
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(campusCenter, 15f))
         }
 
@@ -162,6 +155,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                 // Tıklanan yeri seçmek için ortak fonksiyonu kullanıyoruz
                 konumSecimIslemi(latLng, "Seçilen Konum")
             } else {
+                // Normal modda haritaya boş bir yere tıklanırsa bilgi kartını gizle
                 infoCard.visibility = View.GONE
             }
         }
