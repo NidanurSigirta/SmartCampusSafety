@@ -12,5 +12,10 @@ data class Report(
     var status: String = "Açık", // Varsayılan: Açık, İnceleniyor, Çözüldü
     var timestamp: Timestamp? = null, // Oluşturulma zamanı (Firebase Timestamp türünde)
     var creatorId: String = "",
-    var imageUrl: String = "" // İsteğe bağlı fotoğraf URL'si
-)
+    var imageUrl: String = "", // İsteğe bağlı fotoğraf URL'si
+    val latitude: Double = 0.0,  // x ekseni korinatı
+    val longitude: Double = 0.0  // y ekseni korinatı
+){
+    // Firestore'un veriyi okurken hata vermemesi için bu boş constructor(yapıcı) oluşturuldu
+    constructor() : this("", "", "", "", "", null, "", "", 0.0, 0.0)
+}

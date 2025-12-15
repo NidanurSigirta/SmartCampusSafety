@@ -42,6 +42,14 @@ class ForgotPasswordActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
+            // --- YENİ EKLENEN KISIM: 6 KARAKTER KONTROLÜ ---
+            if (pass1.length < 6) {
+                binding.etNewPassword.error = "Şifre en az 6 karakter olmalı"
+                Toast.makeText(this, "Güvenliğiniz için şifre en az 6 karakter olmalıdır.", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            // ----------------------------------------------
+
             // 3. Şifreler Aynı mı?
             if (pass1 != pass2) {
                 binding.etConfirmPassword.error = "Şifreler uyuşmuyor!"

@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="20dp"
+    android:background="@color/white">
+
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <!-- Toolbar -->
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="65dp"
+            android:layout_marginTop="30dp">
+
+            <ImageView
+                android:id="@+id/btnBack"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:src="@android:drawable/ic_menu_revert"
+                app:tint="@color/purple_700"
+                android:clickable="true"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Bildirim Ayarları"
+                android:textSize="22sp"
+                android:textStyle="bold"
+                android:textColor="@color/purple_700"
+                android:layout_marginStart="16dp"/>
+        </LinearLayout>
+
+        <!-- Sağlık -->
+        <LinearLayout
+            android:id="@+id/rowHealth"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:gravity="center_vertical"
+            android:background="@drawable/purple_frame"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:layout_marginHorizontal="8dp"
+            android:layout_marginBottom="12dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?attr/selectableItemBackground">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="Sağlık"
+                android:textColor="@color/black"
+                android:textSize="16sp"/>
+
+            <Switch
+                android:id="@+id/switchHealth"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="12dp"
+                android:minWidth="48dp"
+                android:minHeight="48dp" />
+        </LinearLayout>
+
+        <!-- Güvenlik -->
+        <LinearLayout
+            android:id="@+id/rowSecurity"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:gravity="center_vertical"
+            android:background="@drawable/lavender_frame"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:layout_marginHorizontal="8dp"
+            android:layout_marginBottom="12dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?attr/selectableItemBackground">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="Güvenlik"
+                android:textColor="@color/black"
+                android:textSize="16sp"/>
+
+            <Switch
+                android:id="@+id/switchSecurity"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="12dp"
+                android:minWidth="48dp"
+                android:minHeight="48dp" />
+        </LinearLayout>
+
+        <!-- Çevre -->
+        <LinearLayout
+            android:id="@+id/rowEnvironment"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:gravity="center_vertical"
+            android:background="@drawable/purple_frame"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:layout_marginHorizontal="8dp"
+            android:layout_marginBottom="12dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?attr/selectableItemBackground">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="Çevre"
+                android:textColor="@color/black"
+                android:textSize="16sp"/>
+
+            <Switch
+                android:id="@+id/switchEnvironment"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="12dp"
+                android:minWidth="48dp"
+                android:minHeight="48dp" />
+        </LinearLayout>
+
+        <!-- Teknik Arıza -->
+        <LinearLayout
+            android:id="@+id/rowTechnical"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:gravity="center_vertical"
+            android:background="@drawable/lavender_frame"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:layout_marginHorizontal="8dp"
+            android:layout_marginBottom="12dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?attr/selectableItemBackground">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="Teknik Arıza"
+                android:textColor="@color/black"
+                android:textSize="16sp"/>
+
+            <Switch
+                android:id="@+id/switchTechnical_fault"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="12dp"
+                android:minWidth="48dp"
+                android:minHeight="48dp" />
+        </LinearLayout>
+
+        <!-- Kayıp - Buluntu -->
+        <LinearLayout
+            android:id="@+id/rowLostFound"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:gravity="center_vertical"
+            android:background="@drawable/purple_frame"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:layout_marginHorizontal="8dp"
+            android:layout_marginBottom="12dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?attr/selectableItemBackground">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="Kayıp - Buluntu"
+                android:textColor="@color/black"
+                android:textSize="16sp"/>
+
+            <Switch
+                android:id="@+id/switchLost_found"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="12dp"
+                android:minWidth="48dp"
+                android:minHeight="48dp" />
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/btnSave"
+            android:text="Kaydet"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:layout_marginTop="24dp"
+            android:backgroundTint="#4CAF50"/>
+    </LinearLayout>
+</ScrollView>

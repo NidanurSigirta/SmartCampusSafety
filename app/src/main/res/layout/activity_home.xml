@@ -32,7 +32,32 @@
             android:inputType="text"
             android:importantForAutofill="no" />
 
-        <!-- Filtre İkonu (DÜZELTME: Sınırlandırılmış, sade tıklama efekti) -->
+        <ImageView
+            android:id="@+id/btnProfile"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/outline_account_circle_24"
+            app:tint="@color/white"
+            android:padding="6dp"
+            android:layout_marginStart="8dp"
+            android:background="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true"
+            tools:ignore="ContentDescription" />
+
+        <ImageView
+            android:id="@+id/btnMapGecis"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@android:drawable/ic_dialog_map"
+            app:tint="@color/white"
+            android:padding="8dp"
+            android:layout_marginStart="8dp"
+            android:background="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true"
+            tools:ignore="ContentDescription" />
+
         <ImageView
             android:id="@+id/ivFilter"
             android:layout_width="40dp"
@@ -40,7 +65,7 @@
             android:src="@android:drawable/ic_menu_sort_by_size"
             app:tint="@color/white"
             android:padding="8dp"
-            android:layout_marginStart="12dp"
+            android:layout_marginStart="4dp"
             android:background="?attr/selectableItemBackground"
             android:clickable="true"
             android:focusable="true"
