@@ -4,10 +4,13 @@ import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.view.View
 import android.widget.PopupMenu
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
@@ -22,11 +25,10 @@ class HomeActivity : AppCompatActivity() {
 
     private lateinit var fullList: ArrayList<Report>
     private lateinit var adapterList: ArrayList<Report>
-
     private lateinit var reportAdapter: ReportAdapter
 
-    // Seçili filtreyi hafızada tutmak için değişken
     private var currentFilterTitle = "Tümü"
+    private var isAdmin = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,6 +37,8 @@ class HomeActivity : AppCompatActivity() {
 
         db = FirebaseFirestore.getInstance()
         auth = FirebaseAuth.getInstance()
+
+        checkUserRole()
 
         binding.recyclerView.layoutManager = LinearLayoutManager(this)
         binding.recyclerView.setHasFixedSize(true)
@@ -45,10 +49,10 @@ class HomeActivity : AppCompatActivity() {
         reportAdapter = ReportAdapter(adapterList)
         binding.recyclerView.adapter = reportAdapter
 
-        // Verileri Çek
         getReports()
+        // YENİ: Acil Duyuruları Dinle
+        listenForEmergencyAnnouncements()
 
-        // --- ARAMA İŞLEVİ ---
         binding.etSearch.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
@@ -57,28 +61,105 @@ class HomeActivity : AppCompatActivity() {
             override fun afterTextChanged(s: Editable?) {}
         })
 
-        // --- PROFİL SAYFASI BUTONU ---
         binding.btnProfile.setOnClickListener {
             val intent = Intent(this, ProfileActivity::class.java)
             startActivity(intent)
         }
 
-        // --- HARİTA BUTONU (YENİ EKLENDİ) ---
-        // ViewBinding kullandığın için findViewById'ye gerek yok, direkt binding ile erişiyoruz.
         binding.btnMapGecis.setOnClickListener {
             val intent = Intent(this, MapActivity::class.java)
             startActivity(intent)
         }
 
-        // --- FİLTRELEME BUTONU ---
         binding.ivFilter.setOnClickListener {
             showFilterMenu()
         }
 
-        // Yeni Ekle Butonu
         binding.fabAddReport.setOnClickListener {
             val intent = Intent(this, AddReportActivity::class.java)
             startActivity(intent)
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        checkForNotifications()
+    }
+
+    // --- ACİL DUYURU DİNLEME ---
+    private fun listenForEmergencyAnnouncements() {
+        // En son atılan duyuruyu al
+        db.collection("announcements")
+            .orderBy("timestamp", Query.Direction.DESCENDING)
+            .limit(1)
+            .addSnapshotListener { value, error ->
+                if (error != null) return@addSnapshotListener
+
+                if (value != null && !value.isEmpty) {
+                    val doc = value.documents[0]
+                    val message = doc.getString("message") ?: ""
+
+                    if (message.isNotEmpty()) {
+                        binding.cardEmergency.visibility = View.VISIBLE
+                        binding.tvEmergencyMessage.text = message
+
+                        // Tıklayınca detaylı oku (Popup)
+                        binding.cardEmergency.setOnClickListener {
+                            AlertDialog.Builder(this)
+                                .setTitle("🚨 ACİL DUYURU")
+                                .setMessage(message)
+                                .setPositiveButton("Tamam", null)
+                                .show()
+                        }
+                    } else {
+                        binding.cardEmergency.visibility = View.GONE
+                    }
+                } else {
+                    binding.cardEmergency.visibility = View.GONE
+                }
+            }
+    }
+
+    private fun checkForNotifications() {
+        val uid = auth.currentUser?.uid ?: return
+        db.collection("users").document(uid).collection("followed_reports")
+            .get().addOnSuccessListener { documents ->
+                if (documents.size() == 0) {
+                    binding.viewHomeNotificationBadge.visibility = View.GONE
+                    return@addOnSuccessListener
+                }
+                var hasUnread = false
+                val totalDocs = documents.size()
+                var checkedDocs = 0
+                for (doc in documents) {
+                    val reportId = doc.id
+                    val lastViewed = doc.getTimestamp("lastViewedTimestamp") ?: Timestamp(0, 0)
+                    db.collection("reports").document(reportId).get().addOnSuccessListener { reportDoc ->
+                        if (reportDoc.exists()) {
+                            val lastUpdate = reportDoc.getTimestamp("lastUpdateTimestamp")
+                            if (lastUpdate != null && lastUpdate > lastViewed) {
+                                hasUnread = true
+                            }
+                        }
+                        checkedDocs++
+                        if (checkedDocs == totalDocs) {
+                            if (hasUnread) binding.viewHomeNotificationBadge.visibility = View.VISIBLE
+                            else binding.viewHomeNotificationBadge.visibility = View.GONE
+                        }
+                    }
+                }
+            }
+    }
+
+    private fun checkUserRole() {
+        val userId = auth.currentUser?.uid ?: return
+        db.collection("users").document(userId).get().addOnSuccessListener { document ->
+            if (document != null && document.exists()) {
+                val role = document.getString("role")
+                if (role == "ADMIN") {
+                    isAdmin = true
+                }
+            }
         }
     }
 
@@ -86,11 +167,7 @@ class HomeActivity : AppCompatActivity() {
         db.collection("reports")
             .orderBy("timestamp", Query.Direction.DESCENDING)
             .addSnapshotListener { value, error ->
-                if (error != null) {
-                    Toast.makeText(this, "Hata: ${error.message}", Toast.LENGTH_SHORT).show()
-                    return@addSnapshotListener
-                }
-
+                if (error != null) return@addSnapshotListener
                 if (value != null) {
                     fullList.clear()
                     for (document in value.documents) {
@@ -99,39 +176,29 @@ class HomeActivity : AppCompatActivity() {
                             fullList.add(report)
                         }
                     }
-                    // Veri ilk geldiğinde mevcut filtreyi tekrar uygula
                     applyCurrentFilter()
                 }
             }
     }
 
-    // Seçili filtreyi listeye uygulama fonksiyonu
     private fun applyCurrentFilter() {
         when (currentFilterTitle) {
             "Tümü" -> reportAdapter.updateList(fullList)
-            "Sadece Açık Olanlar" -> {
+            "Açık Olanlar" -> {
                 val filtered = fullList.filter { it.status == "Açık" } as ArrayList<Report>
                 reportAdapter.updateList(filtered)
             }
-            "Tür: Sağlık" -> {
-                val filtered = fullList.filter { it.type == "Sağlık" } as ArrayList<Report>
-                reportAdapter.updateList(filtered)
-            }
-            "Tür: Güvenlik" -> {
-                val filtered = fullList.filter { it.type == "Güvenlik" } as ArrayList<Report>
-                reportAdapter.updateList(filtered)
-            }
-            "Tür: Teknik Arıza" -> {
-                val filtered = fullList.filter { it.type == "Teknik Arıza" } as ArrayList<Report>
-                reportAdapter.updateList(filtered)
-            }
+            "Tür: Sağlık" -> reportAdapter.updateList(fullList.filter { it.type == "Sağlık" } as ArrayList<Report>)
+            "Tür: Güvenlik" -> reportAdapter.updateList(fullList.filter { it.type == "Güvenlik" } as ArrayList<Report>)
+            "Tür: Teknik Arıza" -> reportAdapter.updateList(fullList.filter { it.type == "Teknik Arıza" } as ArrayList<Report>)
+            "Tür: Kayıp-Buluntu" -> reportAdapter.updateList(fullList.filter { it.type == "Kayıp-Buluntu" } as ArrayList<Report>)
+            "Tür: Çevre" -> reportAdapter.updateList(fullList.filter { it.type == "Çevre" } as ArrayList<Report>)
             else -> reportAdapter.updateList(fullList)
         }
     }
 
     private fun filterBySearch(text: String) {
         val filteredList = ArrayList<Report>()
-        // Aramayı her zaman TÜM liste üzerinden yapıyoruz
         for (item in fullList) {
             if (item.title.lowercase(Locale.getDefault()).contains(text.lowercase(Locale.getDefault())) ||
                 item.description.lowercase(Locale.getDefault()).contains(text.lowercase(Locale.getDefault()))) {
@@ -141,38 +208,28 @@ class HomeActivity : AppCompatActivity() {
         reportAdapter.updateList(filteredList)
     }
 
-    // --- GÜNCELLENMİŞ FİLTRE MENÜSÜ ---
     private fun showFilterMenu() {
         val popup = PopupMenu(this, binding.ivFilter)
+        fun getTitle(title: String): String = if (currentFilterTitle == title) "✓ $title" else title
 
-        // Yardımcı fonksiyon: Eğer bu başlık seçiliyse yanına "✓ " koy
-        fun getTitle(title: String): String {
-            return if (currentFilterTitle == title) "✓ $title" else title
-        }
-
-        // Menü seçeneklerini duruma göre işaretli ekle
+        if (isAdmin) popup.menu.add("★ Admin Paneli")
         popup.menu.add(getTitle("Tümü"))
-        popup.menu.add(getTitle("Sadece Açık Olanlar"))
+        popup.menu.add(getTitle("Açık Olanlar"))
         popup.menu.add(getTitle("Tür: Sağlık"))
         popup.menu.add(getTitle("Tür: Güvenlik"))
         popup.menu.add(getTitle("Tür: Teknik Arıza"))
-        popup.menu.add("Çıkış Yap")
+        popup.menu.add(getTitle("Tür: Kayıp-Buluntu"))
+        popup.menu.add(getTitle("Tür: Çevre"))
 
         popup.setOnMenuItemClickListener { item ->
-            // Tıklanan öğenin başlığındaki "✓ " işaretini temizle ki orijinal metni bulalım
             val rawTitle = item.title.toString().replace("✓ ", "")
-
-            if (rawTitle == "Çıkış Yap") {
-                auth.signOut()
-                startActivity(Intent(this, MainActivity::class.java))
-                finish()
+            if (rawTitle == "★ Admin Paneli") {
+                val intent = Intent(this, AdminPanelActivity::class.java)
+                startActivity(intent)
                 return@setOnMenuItemClickListener true
             }
-
-            // Yeni filtreyi kaydet ve uygula
             currentFilterTitle = rawTitle
             applyCurrentFilter()
-
             true
         }
         popup.show()

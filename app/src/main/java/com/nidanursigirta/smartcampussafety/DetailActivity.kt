@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.View
 import android.widget.ArrayAdapter
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -23,11 +24,12 @@ class DetailActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var auth: FirebaseAuth
     private var reportId: String? = null
     private var currentReport: Report? = null
-
     private lateinit var mMap: GoogleMap
-
-    // Takip durumu kontrolü için
     private var isFollowing = false
+    private var isAdminMode = false
+
+    // Durum seçenekleri
+    private val statusOptions = arrayOf("Açık", "İnceleniyor", "Çözüldü")
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,228 +39,246 @@ class DetailActivity : AppCompatActivity(), OnMapReadyCallback {
         db = FirebaseFirestore.getInstance()
         auth = FirebaseAuth.getInstance()
 
-        // Intent'ten ID'yi al
         reportId = intent.getStringExtra("REPORT_ID")
+        isAdminMode = intent.getBooleanExtra("is_admin", false)
 
         binding.btnBack.setOnClickListener { finish() }
 
         if (reportId != null) {
-            if (reportId!!.startsWith("ornek_")) {
-                // BU BİR ÖRNEK (SAHTE) BİLDİRİMDİR
-                // Veritabanına gitmeyip Intent'ten gelenlerle sahte rapor oluşturma
-                val fakeReport = Report(
-                    reportId = reportId!!,
-                    title = intent.getStringExtra("baslik") ?: "Örnek Başlık",
-                    description = intent.getStringExtra("aciklama") ?: "Açıklama yok",
-                    type = intent.getStringExtra("tur") ?: "Genel",
-                    status = "Açık",
-
-                    // Koordinatları al
-                    latitude = intent.getDoubleExtra("lat", 0.0),
-                    longitude = intent.getDoubleExtra("lng", 0.0),
-                    timestamp = com.google.firebase.Timestamp.now() // Hata vermemesi için şimdiki zaman
-                )
-
-                // Ekranda gösterme
-                currentReport = fakeReport
-                updateUI(fakeReport)
-
-                // Örnek bildirimde zaman yazısını elle düzelt ("10 dk önce" gibi görünsün)
-                val zamanYazisi = intent.getStringExtra("zaman")
-                if (!zamanYazisi.isNullOrEmpty()) {
-                    binding.txtDate.text = zamanYazisi
-                }
-
-                // Örnek bildirimde butonları gizle (Hata çıkmasın)
-                binding.adminPanel.visibility = View.GONE
-                binding.btnFollow.visibility = View.GONE
-
-            } else {
-                getReportDetails(reportId!!)
-                checkUserRole()
-                checkIfFollowing()
-            }
+            getReportDetails(reportId!!)
+            checkUserRole()
+            checkIfFollowing()
+            markAsViewed()
         } else {
-            Toast.makeText(this, "Hata: Rapor ID bulunamadı", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Hata: Rapor ID yok", Toast.LENGTH_SHORT).show()
             finish()
         }
 
-        // Harita Fragment'ını başlatma
+
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.detailMapFragment) as SupportMapFragment
         mapFragment.getMapAsync(this)
 
-        // --- BUTON İŞLEMLERİ ---
+        binding.btnFollow.setOnClickListener { toggleFollowStatus() }
+        binding.btnUpdateStatus.setOnClickListener { updateReportStatus() }
+        binding.btnUpdateDesc.setOnClickListener { updateDescription() }
+        binding.btnDeleteReport.setOnClickListener { deleteReport() }
 
-        // Kullanıcı Takip Butonu
-        binding.btnFollow.setOnClickListener {
-            toggleFollowStatus()
-        }
-
-        // Admin Güncelleme Butonu
-        binding.btnUpdateStatus.setOnClickListener {
-            updateReportStatus()
-        }
-
-        // Admin Spinner Hazırlığı
-        val statuses = arrayOf("Açık", "İnceleniyor", "Çözüldü")
-        val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, statuses)
+        val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, statusOptions)
         binding.spinnerStatus.adapter = adapter
     }
 
-
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
-
-        // Harita ayarları: Sayfayı kaydırırken harita karışmasın diye elle kaydırmayı kapatıyoruz
         mMap.uiSettings.isScrollGesturesEnabled = false
         mMap.uiSettings.isZoomGesturesEnabled = true
-        mMap.uiSettings.isMapToolbarEnabled = false
-
-        // Eğer veriler haritadan önce yüklendiyse (internet hızlıysa) haritayı güncelle
-        if (currentReport != null) {
-            updateMapLocation(currentReport!!)
-        }
+        if (currentReport != null) updateMapLocation(currentReport!!)
     }
 
     private fun getReportDetails(id: String) {
-        db.collection("reports").document(id).get()
-            .addOnSuccessListener { document ->
-                if (document.exists()) {
+        db.collection("reports").document(id)
+            .addSnapshotListener { document, error ->
+                if (error != null) {
+                    Toast.makeText(this, "Veri güncellenemedi: ${error.message}", Toast.LENGTH_SHORT).show()
+                    return@addSnapshotListener
+                }
+
+                if (document != null && document.exists()) {
                     val report = document.toObject(Report::class.java)
                     currentReport = report
                     updateUI(report)
+
+                    // --- YENİ: Bildirimi oluşturan kişinin bilgilerini çek ---
+                    if (report != null && report.creatorId.isNotEmpty()) {
+                        fetchCreatorInfo(report.creatorId)
+                    }
+                }
+            }
+    }
+
+    // --- YENİ EKLENEN FONKSİYON: Kullanıcı Bilgisini Çekme ---
+    private fun fetchCreatorInfo(creatorId: String) {
+        db.collection("users").document(creatorId).get()
+            .addOnSuccessListener { document ->
+                if (document.exists()) {
+                    val name = document.getString("nameSurname") ?: "Bilinmeyen Kullanıcı"
+                    val department = document.getString("department") ?: ""
+
+                    // Admin için hem isim hem bölüm bilgisi yararlı olur
+                    if (department.isNotEmpty()) {
+                        binding.txtCreatorName.text = "Oluşturan: $name ($department)"
+                    } else {
+                        binding.txtCreatorName.text = "Oluşturan: $name"
+                    }
+                } else {
+                    binding.txtCreatorName.text = "Oluşturan: Bilinmiyor"
                 }
             }
             .addOnFailureListener {
-                Toast.makeText(this, "Veri çekilemedi", Toast.LENGTH_SHORT).show()
+                binding.txtCreatorName.text = "Oluşturan bilgisi alınamadı"
             }
     }
 
     private fun updateUI(report: Report?) {
         if (report == null) return
-
         binding.txtTitle.text = report.title
-        binding.txtDescription.text = report.description
+
+        if (binding.etDescription.text.toString() != report.description) {
+            binding.etDescription.setText(report.description)
+        }
+
         binding.txtType.text = report.type
         binding.txtDate.text = report.timestamp?.toDate().toString()
-
-        // Durum Rengi Ayarlama
         binding.txtStatus.text = report.status.uppercase()
+
+        val statusIndex = statusOptions.indexOfFirst { it.equals(report.status, ignoreCase = true) }
+        if (statusIndex >= 0) {
+            binding.spinnerStatus.setSelection(statusIndex)
+        }
+
         when (report.status) {
             "Açık" -> binding.txtStatus.setTextColor(Color.RED)
-            "İnceleniyor" -> binding.txtStatus.setTextColor(Color.parseColor("#FF9800")) // Turuncu
-            "Çözüldü" -> binding.txtStatus.setTextColor(Color.parseColor("#4CAF50")) // Yeşil
+            "İnceleniyor" -> binding.txtStatus.setTextColor(Color.parseColor("#FF9800"))
+            "Çözüldü" -> binding.txtStatus.setTextColor(Color.parseColor("#4CAF50"))
         }
 
-        //Harita hazırsa konumu güncelleme
-        if (::mMap.isInitialized) {
-            updateMapLocation(report)
-        }
+        if (::mMap.isInitialized) updateMapLocation(report)
     }
 
     private fun updateMapLocation(report: Report) {
-        // Eğer koordinatlar 0.0 değilse (yani konum bilgisi varsa)
         if (report.latitude != 0.0 && report.longitude != 0.0) {
-            val location = LatLng(report.latitude, report.longitude)
-
-            mMap.clear() // Eski pinleri temizle
-            mMap.addMarker(MarkerOptions().position(location).title(report.title)) // Pin ekle
-            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(location, 16f)) // Oraya odaklan
+            val loc = LatLng(report.latitude, report.longitude)
+            mMap.clear()
+            mMap.addMarker(MarkerOptions().position(loc).title(report.title))
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(loc, 16f))
         }
     }
 
-    // --- ROL KONTROLÜ (Admin mi User mı?) ---
     private fun checkUserRole() {
+        if (isAdminMode) {
+            setupAdminUI()
+            return
+        }
         val uid = auth.currentUser?.uid ?: return
-
         db.collection("users").document(uid).get().addOnSuccessListener { document ->
             val role = document.getString("role")
-
-            if (role == "admin") {
-                // Admin ise güncelleme panelini göster
-                binding.adminPanel.visibility = View.VISIBLE
-                binding.btnFollow.visibility = View.GONE
+            if (role == "admin" || role == "ADMIN") {
+                setupAdminUI()
             } else {
-                // User ise takip butonunu göster
-                binding.adminPanel.visibility = View.GONE
-                binding.btnFollow.visibility = View.VISIBLE
+                setupUserUI()
             }
         }
     }
 
-    // --- ADMIN İŞLEVİ: DURUM GÜNCELLEME ---
+    private fun setupAdminUI() {
+        binding.adminPanel.visibility = View.VISIBLE
+        binding.btnFollow.visibility = View.GONE
+        binding.etDescription.isEnabled = true
+        binding.etDescription.setBackgroundColor(Color.parseColor("#E3F2FD"))
+    }
+
+    private fun setupUserUI() {
+        binding.adminPanel.visibility = View.GONE
+        binding.btnFollow.visibility = View.VISIBLE
+        binding.etDescription.isEnabled = false
+        binding.etDescription.setBackgroundColor(Color.TRANSPARENT)
+    }
+
+    // --- İŞLEMLER ---
+
     private fun updateReportStatus() {
         val newStatus = binding.spinnerStatus.selectedItem.toString()
-        if (reportId == null) return
+
+        // Sadece Durum Mesajını güncelliyoruz (Eskisinin üzerine yazar, geçmiş birikmez)
+        val msg = "Durum '$newStatus' olarak güncellendi."
 
         db.collection("reports").document(reportId!!)
-            .update("status", newStatus)
+            .update(
+                mapOf(
+                    "status" to newStatus,
+                    "statusUpdateMessage" to msg, // Ayrı alan
+                    "lastUpdateTimestamp" to com.google.firebase.Timestamp.now()
+                )
+            )
             .addOnSuccessListener {
-                Toast.makeText(this, "Durum güncellendi: $newStatus", Toast.LENGTH_SHORT).show()
-
-                // UI'ı anlık güncelle
+                Toast.makeText(this, "Durum güncellendi", Toast.LENGTH_SHORT).show()
                 binding.txtStatus.text = newStatus.uppercase()
-                when (newStatus) {
-                    "Açık" -> binding.txtStatus.setTextColor(Color.RED)
-                    "İnceleniyor" -> binding.txtStatus.setTextColor(Color.parseColor("#FF9800"))
-                    "Çözüldü" -> binding.txtStatus.setTextColor(Color.parseColor("#4CAF50"))
-                }
-
-                // Lokal veriyi de güncelle
-                currentReport?.status = newStatus
-            }
-            .addOnFailureListener {
-                Toast.makeText(this, "Güncelleme başarısız", Toast.LENGTH_SHORT).show()
             }
     }
 
-    // --- USER İŞLEVİ: TAKİP ET / BIRAK ---
+    private fun updateDescription() {
+        val newDesc = binding.etDescription.text.toString()
+        if (reportId == null) return
+
+        // Sadece Açıklama Mesajını güncelliyoruz
+        val msg = "Bildirim açıklaması admin tarafından düzenlendi."
+
+        db.collection("reports").document(reportId!!)
+            .update(
+                mapOf(
+                    "description" to newDesc,
+                    "descUpdateMessage" to msg, // Ayrı alan
+                    "lastUpdateTimestamp" to com.google.firebase.Timestamp.now()
+                )
+            )
+            .addOnSuccessListener {
+                Toast.makeText(this, "Açıklama kaydedildi", Toast.LENGTH_SHORT).show()
+            }
+    }
+
+    private fun deleteReport() {
+        AlertDialog.Builder(this)
+            .setTitle("Silme Onayı")
+            .setMessage("Bu bildirim kalıcı olarak silinsin mi?")
+            .setPositiveButton("Evet") { _, _ ->
+                db.collection("reports").document(reportId!!)
+                    .delete()
+                    .addOnSuccessListener {
+                        Toast.makeText(this, "Silindi.", Toast.LENGTH_SHORT).show()
+                        finish()
+                    }
+            }
+            .setNegativeButton("Hayır", null)
+            .show()
+    }
+
     private fun checkIfFollowing() {
+        val uid = auth.currentUser?.uid ?: return
+        db.collection("users").document(uid)
+            .collection("followed_reports").document(reportId!!)
+            .get().addOnSuccessListener {
+                isFollowing = it.exists()
+                updateFollowButtonUI()
+            }
+    }
+    private fun markAsViewed() {
         val uid = auth.currentUser?.uid ?: return
         if (reportId == null) return
 
+        // Kullanıcının takip listesindeki bu rapora "Şu an gördüm" bilgisini yaz
         db.collection("users").document(uid)
             .collection("followed_reports").document(reportId!!)
-            .get()
-            .addOnSuccessListener { document ->
-                isFollowing = document.exists()
-                updateFollowButtonUI()
+            .update("lastViewedTimestamp", com.google.firebase.Timestamp.now())
+            .addOnFailureListener {
+                // Eğer döküman yoksa (takip etmiyorsa) hata verir, önemli değil.
             }
     }
 
     private fun toggleFollowStatus() {
         val uid = auth.currentUser?.uid ?: return
-        if (reportId == null) return
-
-        val followRef = db.collection("users").document(uid)
+        val ref = db.collection("users").document(uid)
             .collection("followed_reports").document(reportId!!)
 
         if (isFollowing) {
-            // Takipten Çık
-            followRef.delete().addOnSuccessListener {
-                isFollowing = false
-                updateFollowButtonUI()
-                Toast.makeText(this, "Takipten çıkıldı", Toast.LENGTH_SHORT).show()
-            }
+            ref.delete().addOnSuccessListener { isFollowing = false; updateFollowButtonUI() }
         } else {
-            // Takip Et
-            val data = hashMapOf("timestamp" to System.currentTimeMillis())
-            followRef.set(data).addOnSuccessListener {
-                isFollowing = true
-                updateFollowButtonUI()
-                Toast.makeText(this, "Takip listesine eklendi", Toast.LENGTH_SHORT).show()
-            }
+            ref.set(hashMapOf("timestamp" to System.currentTimeMillis()))
+                .addOnSuccessListener { isFollowing = true; updateFollowButtonUI() }
         }
     }
 
     private fun updateFollowButtonUI() {
-        if (isFollowing) {
-            binding.btnFollow.text = "Takipten Çık"
-            binding.btnFollow.setBackgroundColor(Color.GRAY)
-        } else {
-            binding.btnFollow.text = "Bu Bildirimi Takip Et"
-            binding.btnFollow.setBackgroundColor(Color.parseColor("#2196F3")) // Mavi
-        }
+        binding.btnFollow.text = if (isFollowing) "Takipten Çık" else "Takip Et"
+        binding.btnFollow.setBackgroundColor(if (isFollowing) Color.GRAY else Color.parseColor("#2196F3"))
     }
 }

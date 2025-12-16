@@ -7,6 +7,7 @@ import android.widget.Switch
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import android.widget.ImageView
+import android.widget.Toast
 
 class NotificationSettingsActivity : AppCompatActivity() {
 
@@ -58,6 +59,9 @@ class NotificationSettingsActivity : AppCompatActivity() {
         editor.putBoolean("lost", switchLost.isChecked)
 
         editor.apply()
+
+        // Başarıyla kaydedildi mesajı göster
+        Toast.makeText(this, "Başarıyla kaydedildi", Toast.LENGTH_SHORT).show()
     }
 
     // ------------------------------------------
@@ -72,4 +76,6 @@ class NotificationSettingsActivity : AppCompatActivity() {
         switchTechnical.isChecked = sp.getBoolean("technical", true)
         switchLost.isChecked = sp.getBoolean("lost", true)
     }
+
+
 }

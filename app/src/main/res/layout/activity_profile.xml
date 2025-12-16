@@ -122,40 +122,59 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <!-- Takip edilen bildirimler kartı -->
-            <androidx.cardview.widget.CardView
-                android:id="@+id/cardFollowed"
+            <!-- Takip edilen bildirimler kartı ve Kırmızı Nokta -->
+            <FrameLayout
                 android:layout_width="match_parent"
-                android:layout_height="60dp"
+                android:layout_height="wrap_content"
                 android:layout_marginBottom="15dp"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="3dp"
-                app:cardBackgroundColor="#FFFFFF">
+                android:clipChildren="false"
+                android:clipToPadding="false">
 
-                <LinearLayout
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/cardFollowed"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:gravity="center_vertical"
-                    android:paddingHorizontal="16dp">
+                    android:layout_height="60dp"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="3dp"
+                    app:cardBackgroundColor="#FFFFFF">
 
-                    <ImageView
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:src="@drawable/stars_2_24dp_000000__f_ll0_wght400_grad0_opsz24"
-                        app:tint="#FF9800"
-                        android:contentDescription="Takip İkonu"/>
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="center_vertical"
+                        android:paddingHorizontal="16dp">
 
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="Takip Edilen Bildirimler"
-                        android:textSize="16sp"
-                        android:textColor="@color/black"
-                        android:layout_marginStart="16dp"/>
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:src="@drawable/stars_2_24dp_000000__f_ll0_wght400_grad0_opsz24"
+                            app:tint="#FF9800"
+                            android:contentDescription="Takip İkonu"/>
 
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Takip Edilen Bildirimler"
+                            android:textSize="16sp"
+                            android:textColor="@color/black"
+                            android:layout_marginStart="16dp"/>
+
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+
+                <!-- KIRMIZI BİLDİRİM NOKTASI (GÜNCELLENDİ) -->
+                <!-- Boyutu küçültüldü (12dp), konumu ayarlandı, text kaldırıldı -->
+                <View
+                    android:id="@+id/viewNotificationBadge"
+                    android:layout_width="12dp"
+                    android:layout_height="12dp"
+                    android:background="@drawable/red_badge"
+                    android:layout_gravity="center_vertical|end"
+                    android:layout_marginEnd="16dp"
+                    android:elevation="10dp"
+                    android:visibility="gone"/>
+            </FrameLayout>
 
             <!-- Bildirim ayarları kartı -->
             <androidx.cardview.widget.CardView

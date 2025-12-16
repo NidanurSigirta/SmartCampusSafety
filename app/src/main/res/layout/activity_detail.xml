@@ -19,6 +19,7 @@
             android:orientation="vertical"
             android:paddingBottom="20dp">
 
+            <!-- Üst Bar -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -31,7 +32,9 @@
                     android:layout_width="30dp"
                     android:layout_height="30dp"
                     android:src="@android:drawable/ic_menu_revert"
-                    app:tint="@color/black"/>
+                    app:tint="@color/black"
+                    android:clickable="true"
+                    android:focusable="true"/>
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -43,6 +46,7 @@
                     android:layout_marginStart="16dp"/>
             </LinearLayout>
 
+            <!-- Başlık ve Durum Kartı -->
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -95,9 +99,35 @@
                         android:textSize="12sp"
                         android:textColor="#9E9E9E"
                         android:layout_marginTop="8dp"/>
+
+                    <!-- Oluşturan Kişi Bilgisi -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginTop="8dp"
+                        android:gravity="center_vertical">
+
+                        <ImageView
+                            android:layout_width="16dp"
+                            android:layout_height="16dp"
+                            android:src="@android:drawable/ic_menu_myplaces"
+                            app:tint="#757575"/>
+
+                        <TextView
+                            android:id="@+id/txtCreatorName"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Kullanıcı Bilgisi Yükleniyor..."
+                            android:textSize="13sp"
+                            android:textColor="#616161"
+                            android:layout_marginStart="8dp"/>
+                    </LinearLayout>
+
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
+            <!-- Açıklama Kartı (Düzenlenebilir EditText ile) -->
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -120,17 +150,22 @@
                         android:textStyle="bold"
                         android:textColor="@color/black"/>
 
-                    <TextView
-                        android:id="@+id/txtDescription"
+                    <!-- Admin Düzenleyebilsin Diye EditText (Normalde pasif) -->
+                    <EditText
+                        android:id="@+id/etDescription"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="..."
                         android:layout_marginTop="8dp"
-                        android:lineSpacingExtra="4dp"
-                        android:textColor="#424242"/>
+                        android:background="@android:color/transparent"
+                        android:textColor="#424242"
+                        android:inputType="textMultiLine"
+                        android:enabled="false"
+                        android:padding="4dp"/>
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
+            <!-- Harita Kartı -->
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="250dp"
@@ -146,6 +181,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent" />
 
+                <!-- Harita üzerine tıklamayı engellemek için şeffaf view -->
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
@@ -153,9 +189,20 @@
 
             </androidx.cardview.widget.CardView>
 
+            <!-- Fotoğraf (Varsa gösterilecek) -->
+            <ImageView
+                android:id="@+id/ivDetailImage"
+                android:layout_width="match_parent"
+                android:layout_height="250dp"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginBottom="16dp"
+                android:scaleType="centerCrop"
+                android:visibility="gone"/>
+
         </LinearLayout>
     </ScrollView>
 
+    <!-- Alt Aksiyon Alanı -->
     <LinearLayout
         android:id="@+id/bottomActionLayout"
         android:layout_width="match_parent"
@@ -165,6 +212,7 @@
         android:padding="16dp"
         app:layout_constraintBottom_toBottomOf="parent">
 
+        <!-- User için Takip Butonu -->
         <Button
             android:id="@+id/btnFollow"
             android:layout_width="match_parent"
@@ -173,27 +221,62 @@
             android:backgroundTint="#2196F3"
             android:visibility="visible"/>
 
+        <!-- Admin Paneli (Başta GİZLİ) -->
         <LinearLayout
             android:id="@+id/adminPanel"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:visibility="gone"
-            android:gravity="center_vertical">
+            android:orientation="vertical"
+            android:visibility="gone">
 
-            <Spinner
-                android:id="@+id/spinnerStatus"
-                android:layout_width="0dp"
+            <!-- Durum Değiştirme -->
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:padding="8dp"/>
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="8dp">
 
-            <Button
-                android:id="@+id/btnUpdateStatus"
-                android:layout_width="wrap_content"
+                <Spinner
+                    android:id="@+id/spinnerStatus"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:padding="8dp"/>
+
+                <Button
+                    android:id="@+id/btnUpdateStatus"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Durumu Güncelle"
+                    android:backgroundTint="#FF9800"/>
+            </LinearLayout>
+
+            <!-- Açıklama Güncelle ve Sil Butonları -->
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Güncelle"
-                android:backgroundTint="#FF9800"/>
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/btnUpdateDesc"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Açıklamayı Kaydet"
+                    android:backgroundTint="#4CAF50"
+                    android:layout_marginEnd="4dp"/>
+
+                <Button
+                    android:id="@+id/btnDeleteReport"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="SİL"
+                    android:backgroundTint="#F44336"
+                    android:layout_marginStart="4dp"/>
+            </LinearLayout>
+
         </LinearLayout>
     </LinearLayout>
 

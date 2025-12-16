@@ -68,6 +68,7 @@
         <activity
             android:name=".FollowedReportsActivity_"
             android:exported="false" />
+
     </application>
 
 </manifest>

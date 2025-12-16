@@ -32,18 +32,33 @@
             android:inputType="text"
             android:importantForAutofill="no" />
 
-        <ImageView
-            android:id="@+id/btnProfile"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:src="@drawable/outline_account_circle_24"
-            app:tint="@color/white"
-            android:padding="6dp"
-            android:layout_marginStart="8dp"
-            android:background="?attr/selectableItemBackground"
-            android:clickable="true"
-            android:focusable="true"
-            tools:ignore="ContentDescription" />
+        <FrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp">
+
+            <ImageView
+                android:id="@+id/btnProfile"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@drawable/outline_account_circle_24"
+                app:tint="@color/white"
+                android:padding="6dp"
+                android:background="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true"
+                tools:ignore="ContentDescription" />
+
+            <View
+                android:id="@+id/viewHomeNotificationBadge"
+                android:layout_width="10dp"
+                android:layout_height="10dp"
+                android:background="@drawable/red_badge"
+                android:layout_gravity="top|end"
+                android:layout_marginTop="4dp"
+                android:layout_marginEnd="4dp"
+                android:visibility="gone"/>
+        </FrameLayout>
 
         <ImageView
             android:id="@+id/btnMapGecis"
@@ -72,14 +87,66 @@
             tools:ignore="ContentDescription" />
     </LinearLayout>
 
-    <!-- Bildirim Listesi -->
+    <!-- ACİL DURUM KARTI (YENİ EKLENDİ) -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardEmergency"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        app:cardBackgroundColor="#D32F2F"
+        app:cardCornerRadius="8dp"
+        app:cardElevation="4dp"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/topBar">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="12dp"
+            android:gravity="center_vertical">
+
+            <ImageView
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:src="@android:drawable/stat_sys_warning"
+                app:tint="@color/white"/>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:layout_marginStart="12dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="ACİL DUYURU"
+                    android:textColor="@color/white"
+                    android:textStyle="bold"
+                    android:textSize="14sp"/>
+
+                <TextView
+                    android:id="@+id/tvEmergencyMessage"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Duyuru metni buraya gelecek..."
+                    android:textColor="@color/white"
+                    android:textSize="16sp"
+                    android:layout_marginTop="2dp"/>
+            </LinearLayout>
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+
+    <!-- Bildirim Listesi (Kısıtlaması Değişti: Emergency kartının altında) -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:paddingTop="8dp"
         android:clipToPadding="false"
-        app:layout_constraintTop_toBottomOf="@id/topBar"
+        app:layout_constraintTop_toBottomOf="@id/cardEmergency"
         app:layout_constraintBottom_toBottomOf="parent"/>
 
     <!-- Yeni Ekle Butonu (FAB) -->

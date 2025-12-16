@@ -8,10 +8,10 @@ import android.widget.Button
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
-// onStatusClick: Bir butona basıldığında Activity'deki fonksiyonu tetikler
+// onViewDetailClick: "Bildirimi Görüntüle" butonuna basıldığında çalışır
 class AdminReportAdapter(
     private val reportList: ArrayList<Report>,
-    private val onStatusClick: (Report, View) -> Unit
+    private val onViewDetailClick: (Report) -> Unit
 ) : RecyclerView.Adapter<AdminReportAdapter.AdminViewHolder>() {
 
     class AdminViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -34,17 +34,23 @@ class AdminReportAdapter(
         holder.tvType.text = "Tür: ${currentItem.type}"
         holder.tvStatus.text = "Durum: ${currentItem.status}"
 
-        // Duruma göre renk değişimi (Görsellik puanı kazandırır)
+        // --- İSTEK: Butonun Adını Değiştir ---
+        holder.btnChangeStatus.text = "Bildirimi Görüntüle"
+
+        // Renklendirme
         when (currentItem.status) {
             "Açık" -> holder.tvStatus.setTextColor(Color.RED)
-            "İnceleniyor" -> holder.tvStatus.setTextColor(Color.parseColor("#FFA500")) // Turuncu
-            "Çözüldü" -> holder.tvStatus.setTextColor(Color.parseColor("#008000")) // Yeşil
+            "İnceleniyor" -> holder.tvStatus.setTextColor(Color.parseColor("#FFA500"))
+            "Çözüldü" -> holder.tvStatus.setTextColor(Color.parseColor("#008000"))
         }
 
-        // Butona tıklanınca bu raporu ve butonu(popup menü açmak için) gönder
+        // --- İSTEK: Mavi Butona Basınca Detay Aç ---
         holder.btnChangeStatus.setOnClickListener {
-            onStatusClick(currentItem, holder.btnChangeStatus)
+            onViewDetailClick(currentItem)
         }
+
+        // Satırın kendisine tıklama özelliği iptal edildi (Sadece butona basılsın)
+        holder.itemView.setOnClickListener(null)
     }
 
     override fun getItemCount(): Int {
