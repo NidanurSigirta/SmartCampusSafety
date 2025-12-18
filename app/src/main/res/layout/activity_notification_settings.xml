@@ -27,8 +27,11 @@
                 android:src="@android:drawable/ic_menu_revert"
                 app:tint="#512DA8"
                 android:clickable="true"
+                android:focusable="true"
+                android:background="?attr/selectableItemBackgroundBorderless"
                 android:contentDescription="Geri Dön"
-                android:focusable="true" />
+
+                />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -36,7 +39,7 @@
                 android:text="Bildirim Ayarları"
                 android:textSize="22sp"
                 android:textStyle="bold"
-                android:textColor="#512DA8"
+                android:textColor="@color/purple_700"
                 android:layout_marginStart="16dp"/>
         </LinearLayout>
 
@@ -200,7 +203,7 @@
                 android:minHeight="48dp" />
         </LinearLayout>
 
-        <!-- KAYDET BUTONU -->
+        <!-- Kaydet Butonu -->
         <Button
             android:id="@+id/btnSave"
             android:text="Kaydet"
@@ -208,7 +211,7 @@
             android:layout_height="55dp"
             android:textStyle="bold"
             android:textSize="16sp"
-            android:backgroundTint="#4CAF50"
+            android:backgroundTint="@color/green"
             android:layout_marginHorizontal="8dp"/>
 
     </LinearLayout>

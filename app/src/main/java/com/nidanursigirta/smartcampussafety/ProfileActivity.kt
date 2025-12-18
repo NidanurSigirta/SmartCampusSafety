@@ -33,7 +33,7 @@ class ProfileActivity : AppCompatActivity() {
 
         loadUserProfile()
 
-        // YENİ: Kırmızı nokta kontrolü
+        // Kırmızı nokta kontrolü
         checkUnreadNotifications()
 
         binding.cardFollowed.setOnClickListener {
@@ -109,25 +109,35 @@ class ProfileActivity : AppCompatActivity() {
             }
     }
 
+    // --- Kullanıcı Bilgilerini Veritabanından Çekme ---
     private fun loadUserProfile() {
+        // Giriş yapan kullanıcının kimliğini al, yoksa işlemi durdur
         val userId = auth.currentUser?.uid ?: return
+
         db.collection("users").document(userId).get()
             .addOnSuccessListener { document ->
                 if (document.exists()) {
+                    // Veritabanındaki isim ve e-postayı ekrandaki yerlerine yazma
                     binding.tvProfileName.text = document.getString("nameSurname")
                     binding.tvProfileEmail.text = document.getString("email")
+
+                    // Rol bilgisini alma (Baş harfi büyük olacak şekilde)
                     val role = document.getString("role") ?: "user"
                     binding.tvProfileRole.text = role.replaceFirstChar { it.uppercase() }
                 }
             }
     }
 
+    // --- Çıkış Yapma ---
     private fun logoutUser() {
         auth.signOut()
         Toast.makeText(this, "Çıkış yapıldı", Toast.LENGTH_SHORT).show()
         val intent = Intent(this, MainActivity::class.java)
+
+        //Geri tuşuna basınca tekrar profile dönmek için geçmişi temizleme
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         startActivity(intent)
+
         finish()
     }
 }

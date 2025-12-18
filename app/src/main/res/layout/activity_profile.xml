@@ -15,6 +15,9 @@
         android:padding="8dp"
         android:src="@android:drawable/ic_menu_revert"
         app:tint="@color/white"
+        android:clickable="true"
+        android:focusable="true"
+        android:background="?attr/selectableItemBackgroundBorderless"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         android:contentDescription="Geri Dön"/>
@@ -60,7 +63,7 @@
             android:padding="15dp"
             android:scaleType="centerCrop"
             android:src="@drawable/contacts_product_24dp_000000__f_ll0_wght400_grad0_opsz24"
-            app:tint="#757575"
+            app:tint="@color/gray_600"
             android:contentDescription="Profil Fotoğrafı"/>
     </androidx.cardview.widget.CardView>
 
@@ -83,7 +86,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Kullanıcı Rolü"
-        android:textColor="#2196F3"
+        android:textColor="@color/blue_500"
         android:textSize="16sp"
         android:textStyle="bold"
         android:layout_marginTop="4dp"
@@ -96,7 +99,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="email@ornek.com"
-        android:textColor="#757575"
+        android:textColor="@color/gray_600"
         android:textSize="14sp"
         android:layout_marginTop="2dp"
         app:layout_constraintTop_toBottomOf="@id/tvProfileRole"
@@ -136,7 +139,7 @@
                     android:layout_height="60dp"
                     app:cardCornerRadius="12dp"
                     app:cardElevation="3dp"
-                    app:cardBackgroundColor="#FFFFFF">
+                    app:cardBackgroundColor="@color/white">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -148,7 +151,7 @@
                             android:layout_width="24dp"
                             android:layout_height="24dp"
                             android:src="@drawable/stars_2_24dp_000000__f_ll0_wght400_grad0_opsz24"
-                            app:tint="#FF9800"
+                            app:tint="@color/orange_500"
                             android:contentDescription="Takip İkonu"/>
 
                         <TextView
@@ -163,8 +166,7 @@
                     </LinearLayout>
                 </androidx.cardview.widget.CardView>
 
-                <!-- KIRMIZI BİLDİRİM NOKTASI (GÜNCELLENDİ) -->
-                <!-- Boyutu küçültüldü (12dp), konumu ayarlandı, text kaldırıldı -->
+                <!-- Kırmızı bildirim noktası -->
                 <View
                     android:id="@+id/viewNotificationBadge"
                     android:layout_width="12dp"
@@ -184,7 +186,7 @@
                 android:layout_marginBottom="25dp"
                 app:cardCornerRadius="12dp"
                 app:cardElevation="3dp"
-                app:cardBackgroundColor="#FFFFFF">
+                app:cardBackgroundColor="@color/white">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -196,7 +198,7 @@
                         android:layout_width="24dp"
                         android:layout_height="24dp"
                         android:src="@android:drawable/ic_popup_reminder"
-                        app:tint="#4CAF50"
+                        app:tint="@color/green"
                         android:contentDescription="Ayarlar İkonu"/>
 
                     <TextView
@@ -219,7 +221,7 @@
                 android:text="Çıkış Yap"
                 android:textSize="16sp"
                 android:textStyle="bold"
-                android:backgroundTint="#F44336"
+                android:backgroundTint="@color/red_500"
                 app:cornerRadius="30dp"/>
 
             <View

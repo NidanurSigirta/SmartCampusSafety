@@ -24,7 +24,7 @@ class DetailActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var auth: FirebaseAuth
     private var reportId: String? = null
     private var currentReport: Report? = null
-    private lateinit var mMap: GoogleMap
+    private lateinit var map: GoogleMap
     private var isFollowing = false
     private var isAdminMode = false
 
@@ -36,9 +36,11 @@ class DetailActivity : AppCompatActivity(), OnMapReadyCallback {
         binding = ActivityDetailBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        // Veritabanı ve kimlik doğrulama servislerini başlatma.
         db = FirebaseFirestore.getInstance()
         auth = FirebaseAuth.getInstance()
 
+        // Önceki sayfadan gönderilen verileri (ID ve Mod) alma.
         reportId = intent.getStringExtra("REPORT_ID")
         isAdminMode = intent.getBooleanExtra("is_admin", false)
 
@@ -54,11 +56,12 @@ class DetailActivity : AppCompatActivity(), OnMapReadyCallback {
             finish()
         }
 
-
+        // Harita bileşenini (Fragment) arayüzden tanımlayıp yükleme işlemini başlatıyoruz.
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.detailMapFragment) as SupportMapFragment
         mapFragment.getMapAsync(this)
 
+        // Kullanıcı arayüzü buton dinleyicileri tanımlandı.
         binding.btnFollow.setOnClickListener { toggleFollowStatus() }
         binding.btnUpdateStatus.setOnClickListener { updateReportStatus() }
         binding.btnUpdateDesc.setOnClickListener { updateDescription() }
@@ -68,13 +71,21 @@ class DetailActivity : AppCompatActivity(), OnMapReadyCallback {
         binding.spinnerStatus.adapter = adapter
     }
 
+    /** * Google Haritası hazır olduğunda ilk konum odaklamasını yapan
+     * ve arayüz zoom ayarlarını içeren fonksiyon.
+     */
     override fun onMapReady(googleMap: GoogleMap) {
-        mMap = googleMap
-        mMap.uiSettings.isScrollGesturesEnabled = false
-        mMap.uiSettings.isZoomGesturesEnabled = true
+        map = googleMap
+
+        // Detay ekranı olduğu için kaydırmayı (scroll) kapatıp, yakınlaştırma (zoom) özelliğini açık bıraktık.
+        map.uiSettings.isScrollGesturesEnabled = false
+        map.uiSettings.isZoomGesturesEnabled = true
+
+        // Veritabanından gelen rapor verisi harita hazır olmadan önce yüklendiyse, konumu hemen güncelliyoruz.
         if (currentReport != null) updateMapLocation(currentReport!!)
     }
 
+    // Rapor detaylarını anlık olarak takip eden fonksiyon.
     private fun getReportDetails(id: String) {
         db.collection("reports").document(id)
             .addSnapshotListener { document, error ->
@@ -88,7 +99,7 @@ class DetailActivity : AppCompatActivity(), OnMapReadyCallback {
                     currentReport = report
                     updateUI(report)
 
-                    // --- YENİ: Bildirimi oluşturan kişinin bilgilerini çek ---
+                    // Bildirimi oluşturan kişinin bilgilerini çekme işlemi.
                     if (report != null && report.creatorId.isNotEmpty()) {
                         fetchCreatorInfo(report.creatorId)
                     }
@@ -96,7 +107,7 @@ class DetailActivity : AppCompatActivity(), OnMapReadyCallback {
             }
     }
 
-    // --- YENİ EKLENEN FONKSİYON: Kullanıcı Bilgisini Çekme ---
+    // Kullanıcı bilgisini çeken fonksiyon.
     private fun fetchCreatorInfo(creatorId: String) {
         db.collection("users").document(creatorId).get()
             .addOnSuccessListener { document ->
@@ -104,7 +115,7 @@ class DetailActivity : AppCompatActivity(), OnMapReadyCallback {
                     val name = document.getString("nameSurname") ?: "Bilinmeyen Kullanıcı"
                     val department = document.getString("department") ?: ""
 
-                    // Admin için hem isim hem bölüm bilgisi yararlı olur
+                    // Admin için hem isim hem bölüm bilgisi yararlı olur.
                     if (department.isNotEmpty()) {
                         binding.txtCreatorName.text = "Oluşturan: $name ($department)"
                     } else {
@@ -142,15 +153,28 @@ class DetailActivity : AppCompatActivity(), OnMapReadyCallback {
             "Çözüldü" -> binding.txtStatus.setTextColor(Color.parseColor("#4CAF50"))
         }
 
-        if (::mMap.isInitialized) updateMapLocation(report)
+        if (::map.isInitialized) updateMapLocation(report)
     }
 
     private fun updateMapLocation(report: Report) {
-        if (report.latitude != 0.0 && report.longitude != 0.0) {
-            val loc = LatLng(report.latitude, report.longitude)
-            mMap.clear()
-            mMap.addMarker(MarkerOptions().position(loc).title(report.title))
-            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(loc, 16f))
+        // Atatürk Üniversitesi Kampüs Merkezi koordinatları.
+        val campusCenter = LatLng(39.89953921087502, 41.244187083657714)
+
+        // Harita görsel olarak tamamen hazır olduğunda komutu çalıştır.
+        // (Bu sayede varsayılan konum olarak Afrika değil de Atatürk Üniversitesi Kampüs Merkezi'ni gösterecek.)
+        map.setOnMapLoadedCallback {
+            // Bildirimde gerçek bir konum eklenmişse:
+            if (report.latitude != 0.0 && report.longitude != 0.0) {
+                val loc = LatLng(report.latitude, report.longitude)
+                map.clear()
+                map.addMarker(MarkerOptions().position(loc).title(report.title))
+                map.animateCamera(CameraUpdateFactory.newLatLngZoom(loc, 16f))
+            }
+            // Konum bilgisi eklenmediyse veya eklenirken bir sorun çıktıysa konum olarak üniversite kampüsünü göster.
+            else {
+                // Harita üzerinde yumuşak bir geçiş için animateCamera() metodu kullanıldı.
+                map.animateCamera(CameraUpdateFactory.newLatLngZoom(campusCenter, 15f))
+            }
         }
     }
 
@@ -189,7 +213,7 @@ class DetailActivity : AppCompatActivity(), OnMapReadyCallback {
     private fun updateReportStatus() {
         val newStatus = binding.spinnerStatus.selectedItem.toString()
 
-        // Sadece Durum Mesajını güncelliyoruz (Eskisinin üzerine yazar, geçmiş birikmez)
+        // Sadece Durum Mesajını güncelliyoruz (Eskisinin üzerine yazar, geçmiş birikmez).
         val msg = "Durum '$newStatus' olarak güncellendi."
 
         db.collection("reports").document(reportId!!)
@@ -210,7 +234,7 @@ class DetailActivity : AppCompatActivity(), OnMapReadyCallback {
         val newDesc = binding.etDescription.text.toString()
         if (reportId == null) return
 
-        // Sadece Açıklama Mesajını güncelliyoruz
+        // Sadece Açıklama Mesajını güncelliyoruz.
         val msg = "Bildirim açıklaması admin tarafından düzenlendi."
 
         db.collection("reports").document(reportId!!)
@@ -251,16 +275,17 @@ class DetailActivity : AppCompatActivity(), OnMapReadyCallback {
                 updateFollowButtonUI()
             }
     }
+
     private fun markAsViewed() {
         val uid = auth.currentUser?.uid ?: return
         if (reportId == null) return
 
-        // Kullanıcının takip listesindeki bu rapora "Şu an gördüm" bilgisini yaz
+        // Kullanıcının takip listesindeki bu rapora "Şu an gördüm" bilgisini yaz.
         db.collection("users").document(uid)
             .collection("followed_reports").document(reportId!!)
             .update("lastViewedTimestamp", com.google.firebase.Timestamp.now())
             .addOnFailureListener {
-                // Eğer döküman yoksa (takip etmiyorsa) hata verir, önemli değil.
+                // Eğer doküman yoksa (takip etmiyorsa) hata verir, önemli değil.
             }
     }
 

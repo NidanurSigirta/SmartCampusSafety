@@ -4,7 +4,6 @@ import android.content.Context
 import android.os.Bundle
 import android.widget.Button
 import android.widget.Switch
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import android.widget.ImageView
 import android.widget.Toast
@@ -22,7 +21,7 @@ class NotificationSettingsActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_notification_settings)
 
-        // Switch bağlama
+        // Switch bileşenlerinin XML bağlantılarını yapma
         switchHealth = findViewById(R.id.switchHealth)
         switchSecurity = findViewById(R.id.switchSecurity)
         switchEnvironment = findViewById(R.id.switchEnvironment)
@@ -36,7 +35,7 @@ class NotificationSettingsActivity : AppCompatActivity() {
             finish()
         }
 
-        // Eskiden kaydedilen ayarları yükle
+        // Eskiden kaydedilmiş olan kullanıcı ayarlarını yükler.
         loadSettings()
 
         // Kaydet butonu

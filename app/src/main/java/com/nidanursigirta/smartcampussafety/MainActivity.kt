@@ -61,7 +61,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    // --- DEĞİŞİKLİK YAPILAN KISIM BURASI ---
     private fun checkUserRole(userId: String) {
         db.collection("users").document(userId).get()
             .addOnSuccessListener { document ->

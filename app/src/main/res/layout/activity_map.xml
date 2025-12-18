@@ -7,6 +7,7 @@
     android:layout_height="match_parent"
     tools:context=".MapActivity">
 
+    <!-- Google Harita -->
     <fragment
         android:id="@+id/mapFragment"
         android:name="com.google.android.gms.maps.SupportMapFragment"
@@ -17,6 +18,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <!-- Geri butonu -->
     <androidx.cardview.widget.CardView
         android:id="@+id/btnBackContainer"
         android:layout_width="45dp"
@@ -26,7 +28,11 @@
         app:cardElevation="8dp"
         app:cardBackgroundColor="@color/white"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+
+        android:clickable="true"
+        android:focusable="true"
+        android:foreground="?attr/selectableItemBackgroundBorderless" >
 
         <ImageView
             android:layout_width="match_parent"
@@ -37,6 +43,7 @@
             android:contentDescription="Geri Dön" />
     </androidx.cardview.widget.CardView>
 
+    <!-- Konum Arama Kısmı -->
     <androidx.cardview.widget.CardView
         android:id="@+id/searchCard"
         android:layout_width="0dp"
@@ -60,6 +67,7 @@
             app:queryHint="Konum ara (Örn: Kütüphane)..." />
     </androidx.cardview.widget.CardView>
 
+    <!-- Seçilen Konum / Bildirim Bilgi Kartı -->
     <androidx.cardview.widget.CardView
         android:id="@+id/infoCard"
         android:layout_width="0dp"
@@ -87,7 +95,7 @@
                 android:textSize="12sp"
                 android:textStyle="bold"
                 android:letterSpacing="0.1"
-                android:textColor="#D32F2F"/>
+                android:textColor="@color/red_700"/>
 
             <TextView
                 android:id="@+id/txtBaslik"
@@ -105,7 +113,7 @@
                 android:layout_height="wrap_content"
                 android:text="10 dk önce"
                 android:textSize="14sp"
-                android:textColor="#757575"
+                android:textColor="@color/gray_600"
                 android:layout_marginTop="4dp"/>
 
             <Button
@@ -114,20 +122,21 @@
                 android:layout_height="wrap_content"
                 android:text="Detayı Gör"
                 android:layout_marginTop="15dp"
-                android:backgroundTint="#2196F3"
+                android:backgroundTint="@color/blue_500"
                 android:textColor="@color/white"/>
 
         </LinearLayout>
 
     </androidx.cardview.widget.CardView>
 
+    <!-- Konum Seçme Onay Butonu -->
     <Button
         android:id="@+id/btnKonumSec"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Bu Konumu Seç ✅"
-        android:backgroundTint="#2E7D32"
-        android:textColor="#FFFFFF"
+        android:backgroundTint="@color/green_700"
+        android:textColor="@color/white"
         android:padding="12dp"
         android:visibility="gone"
         android:layout_marginBottom="30dp"

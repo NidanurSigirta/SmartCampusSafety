@@ -21,7 +21,9 @@ import com.google.android.gms.maps.model.MarkerOptions
 import java.util.Locale // Dil ayarı
 import com.google.firebase.firestore.FirebaseFirestore
 
-// 1. Veri Modeli
+/*
+Harita üzerindeki bildirimleri temsil eden veri modeli.
+*/
 data class HaritaBildirim(
     val reportId: String,
     val baslik: String,
@@ -29,27 +31,27 @@ data class HaritaBildirim(
     val zaman: String,
     val lat: Double,
     val lng: Double,
-    val aciklama: String = "" //Bildiirm detay ekranı konum için
+    val aciklama: String = "" // Bildirim detay ekranında gösterilecek açıklama.
 )
 
 class MapActivity : AppCompatActivity(), OnMapReadyCallback {
 
-    private lateinit var mMap: GoogleMap
+    private lateinit var map: GoogleMap
     private lateinit var db: FirebaseFirestore
 
-    // Arayüz elemanlarını tanımlayalım
+    // Arayüz elemanları
     private lateinit var infoCard: CardView
     private lateinit var txtTur: TextView
     private lateinit var txtBaslik: TextView
     private lateinit var txtZaman: TextView
     private lateinit var btnDetay: Button
 
-    private lateinit var searchViewMap: SearchView // Arama Çubuğu değişkeni
+    private lateinit var searchViewMap: SearchView // Arama çubuğu değişkeni
 
-    // Geri Butonu Değişkeni
     private lateinit var btnBackContainer: CardView
 
-    // Konum Seçimi İçin Gerekli Değişkenler
+
+    // Konum seçimi için gerekli değişkenler
     private lateinit var btnKonumSec: Button
     private var secilenLatLng: LatLng? = null
     private var isSelectionMode = false
@@ -58,8 +60,8 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_map)
 
-        db = FirebaseFirestore.getInstance() //Firestore'u başlatıldı
-        // XML elemanlarını bağlayalım
+        db = FirebaseFirestore.getInstance() // Firestore servisi başlatıldı.
+        // XML elemanlarını bağlama işlemi.
         infoCard = findViewById(R.id.infoCard)
         txtTur = findViewById(R.id.txtTur)
         txtBaslik = findViewById(R.id.txtBaslik)
@@ -68,7 +70,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         btnKonumSec = findViewById(R.id.btnKonumSec)
         searchViewMap = findViewById(R.id.searchViewMap)
 
-        // Geri Butonu Tanımlama
+        // Geri butonu tanımlama ve tıklama olayı.
         btnBackContainer = findViewById(R.id.btnBackContainer)
         btnBackContainer.setOnClickListener {
             finish() // Sayfayı kapatıp geri döner
@@ -76,14 +78,14 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
 
         // --- Konum Seçme Mantığı ---
 
-        // Mod Kontrolü: Diğer sayfadan "selection" emri geldi mi?
+        // Diğer sayfadan "selection" modu ile gelinip gelinmediğinin kontrol etme.
         val mode = intent.getStringExtra("mode")
         if (mode == "selection") {
             isSelectionMode = true
             Toast.makeText(this, "Lütfen haritada bir yere tıklayın", Toast.LENGTH_LONG).show()
         }
 
-        // Onay Butonuna Tıklayınca
+        // Konum onay butonuna tıklandığında yapılacak işlemler.
         btnKonumSec.setOnClickListener {
             if (secilenLatLng != null) {
                 // Seçilen verileri paketleyip geri gönderiyoruz
@@ -101,8 +103,8 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         searchViewMap.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
                 if (!query.isNullOrEmpty()) {
-                    searchLocation(query) // EKSİK OLAN FONKSİYONU ARTIK AŞAĞIDA TANIMLADIK
-                    searchViewMap.clearFocus() // Klavyeyi kapat
+                    searchLocation(query) // Girilen konumu arayan fonksiyonu çağırır.
+                    searchViewMap.clearFocus() // Arama işlemi bitince  klavyeyi kapatır.
                 }
                 return true
             }
@@ -112,34 +114,30 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
             }
         })
 
-        // Haritayı yükleme
+        // Harita bileşenini yükleme.
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.mapFragment) as SupportMapFragment
         mapFragment.getMapAsync(this)
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
-        mMap = googleMap
+        map = googleMap
 
-        // Kampüs Merkezi Koordinatları (Hem normal mod hem seçim modu için varsayılan odak)
+        // Kampüs merkezi koordinatları (Varsayılan odak noktası).
         val campusCenter = LatLng(39.89953921087502, 41.244187083657714)
 
-        if (!isSelectionMode) {
-            // NORMAL MOD
-            // Örnek liste kodları SİLİNDİ.
-
-            fetchReportsFromFirestore() // Sadece veritabanındaki gerçek verileri getir
-
-            // Harita açılınca varsayılan olarak kampüs merkezine odaklan
-            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(campusCenter, 15f))
-
-        } else {
-            // SEÇİM MODU (Kampüs merkezine odaklan)
-            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(campusCenter, 15f))
+        // Harita tamamen yüklendiğinde kamerayı kampüs merkezine odakla.
+        map.setOnMapLoadedCallback {
+            map.animateCamera(CameraUpdateFactory.newLatLngZoom(campusCenter, 15f)) //Geçişi yumuşatmak için moveCamera() methodu yerine animateCamera() metodu kullanılmıştır.
         }
 
-        // MEVCUT PİNLERE TIKLAMA (Sadece Normal Modda)
-        mMap.setOnMarkerClickListener { marker ->
+        // Eğer seçim modunda değilse, veritabanındaki kayıtlı pinleri getir.
+        if (!isSelectionMode) {
+            fetchReportsFromFirestore() // Sadece veritabanındaki gerçek harita verilerini getir
+        }
+
+        // Mevcut pinlere tıklama olayı.
+        map.setOnMarkerClickListener { marker ->
             if (!isSelectionMode) {
                 val secilenBildirim = marker.tag as? HaritaBildirim
                 if (secilenBildirim != null) {
@@ -149,19 +147,21 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
             false
         }
 
-        // HARİTAYA TIKLAMA (Elle Seçim)
-        mMap.setOnMapClickListener { latLng ->
+        // Harita üzerinde boş bir yere tıklama olayı. (Elle seçim yapma kısmı)
+        map.setOnMapClickListener { latLng ->
             if (isSelectionMode) {
-                // Tıklanan yeri seçmek için ortak fonksiyonu kullanıyoruz
+                // Tıklanan konumu seçmek için konumSecimIslemi fonksiyonu kullanır.
                 konumSecimIslemi(latLng, "Seçilen Konum")
             } else {
-                // Normal modda haritaya boş bir yere tıklanırsa bilgi kartını gizle
+                // Normal modda haritada boş bir yere tıklanırsa bilgi kartını gizler.
                 infoCard.visibility = View.GONE
             }
         }
     }
 
-    //
+    /*
+      Metin tabanlı konum araması yapar ve haritayı o konuma taşır.
+     */
     private fun searchLocation(locationName: String) {
         val geocoder = Geocoder(this, Locale.getDefault()) //Arama çubuğu için gerekli servisi başlatır.
         try {
@@ -172,10 +172,10 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                 val address = addressList[0] //Bulunan ilk adres
                 val latLng = LatLng(address.latitude, address.longitude)
 
-                // Kamerayı oraya götür
-                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 16f))
+                // Kamerayı bulunan konuma taşır.
+                map.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 16f))
 
-                // Eğer seçim modundaysak oraya PİN de koy
+                // Seçim modundaysak bulunan konuma yeşil pin ekler.
                 if (isSelectionMode) {
                     konumSecimIslemi(latLng, locationName) // Ortak fonksiyonu çağırdık
                     Toast.makeText(this, "Konum seçildi: $locationName", Toast.LENGTH_SHORT).show()
@@ -192,20 +192,25 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
-
+    /*
+      Harita üzerinde tıklanan veya aranan yeri işaretler.
+     */
     private fun konumSecimIslemi(latLng: LatLng, title: String) {
-        mMap.clear() // Eski pinleri sil
-        //Seçilen yeşil konum iconunu seçilen yerde gösterme
-        mMap.addMarker(
+        map.clear() // Eski pinleri siler.
+        //Seçilen yeşil konum iconunu seçilen yerde gösterme:
+        map.addMarker(
             MarkerOptions()
                 .position(latLng)
                 .title(title)
                 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
         )
-        secilenLatLng = latLng //Seçilen konumun kordinat değerlerini saklar
-        btnKonumSec.visibility = View.VISIBLE // Onay butonunu aç
+        secilenLatLng = latLng // Seçilen koordinat değerlerini saklar.
+        btnKonumSec.visibility = View.VISIBLE // Onay butonunu görünür yapar.
     }
 
+    /*
+      Firestore'dan gelen verileri haritaya pin olarak ekler.
+     */
     private fun pinEkle(bildirim: HaritaBildirim) {
         val konum = LatLng(bildirim.lat, bildirim.lng)
         val renk = when (bildirim.tur) {
@@ -215,7 +220,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
             else -> BitmapDescriptorFactory.HUE_VIOLET
         }
 
-        val marker = mMap.addMarker(
+        val marker = map.addMarker(
             MarkerOptions()
                 .position(konum)
                 .title(bildirim.baslik)
@@ -224,18 +229,22 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         marker?.tag = bildirim
     }
 
+    /*
+      Haritadaki bir pine tıklandığında alt bilgi kartını doldurur ve gösterir.
+     */
     private fun kartGoster(bildirim: HaritaBildirim) {
         txtBaslik.text = bildirim.baslik
         txtTur.text = bildirim.tur.uppercase()
         txtZaman.text = bildirim.zaman
 
+        // Bildirim türüne göre metin rengini ayarlar.
         when(bildirim.tur) {
             "Tehlike" -> txtTur.setTextColor(resources.getColor(android.R.color.holo_red_dark))
             "Bilgi" -> txtTur.setTextColor(resources.getColor(android.R.color.holo_blue_dark))
             else -> txtTur.setTextColor(resources.getColor(android.R.color.darker_gray))
         }
 
-
+        // Detay butonuna tıklanınca detay sayfasına veri taşır.
         btnDetay.setOnClickListener {
             val intent = Intent(this, DetailActivity::class.java) //İlgili bildirim sayfasına geçiş için intent oluşturuldu
 
@@ -258,7 +267,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
     //Yeni Bildirimin Haritada Gösterilmesi
     private fun fetchReportsFromFirestore(){
         db.collection("reports")
-            .whereEqualTo("status", "Açık") // Sadece Açık olanları getir
+            .whereEqualTo("status", "Açık") // Sadece aktif olan bildirimleri filtreler ve getirir.
             .get()
             .addOnSuccessListener { documents ->
                 for (document in documents) {
@@ -274,7 +283,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
 
                         if (lat != null && lng != null && lat != 0.0 && lng != 0.0) {
                             val bildirim = HaritaBildirim(id, title, type, timestamp, lat, lng, desc)
-                            pinEkle(bildirim) // Haritaya ekle
+                            pinEkle(bildirim) // Oluşturulan nesneyi haritaya ekler.
                         }
                     } catch (e: Exception) {
                         e.printStackTrace()

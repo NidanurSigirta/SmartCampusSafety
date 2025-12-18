@@ -34,7 +34,9 @@
                     android:src="@android:drawable/ic_menu_revert"
                     app:tint="@color/black"
                     android:clickable="true"
-                    android:focusable="true"/>
+                    android:focusable="true"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    />
 
                 <TextView
                     android:layout_width="wrap_content"
